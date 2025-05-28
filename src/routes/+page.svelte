@@ -1,6 +1,7 @@
 <script>
 	import { config, initializeMasses } from '$lib/config';
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 
 	let physicsParams = {
 		G: config.G,
@@ -11,14 +12,11 @@
 	let nBodies = 3;
 
 	function startSimulation() {
-		// Update config with new values
 		config.G = physicsParams.G;
 		config.DT = physicsParams.DT;
 		config.SOFTENING = physicsParams.SOFTENING;
 		config.scenario = 'N';
-		
-		// Navigate to the simulation with N parameter
-		goto(`/N?n=${nBodies}`);
+		goto(`${base}/N?n=${nBodies}`);
 	}
 </script>
 
@@ -55,7 +53,6 @@
 					Number of Bodies (N):
 					<input type="number" bind:value={nBodies} min="2" max="1000" step="1">
 				</label>
-				<p class="description">All bodies will have equal mass and be arranged in a circle</p>
 			</div>
 		</div>
 	</div>
@@ -119,12 +116,6 @@
 		padding: 0.5rem;
 		border-radius: 4px;
 		width: 100%;
-	}
-
-	.description {
-		margin: 0.5rem 0 0 0;
-		opacity: 0.8;
-		font-size: 0.9rem;
 	}
 
 	.start-button {
