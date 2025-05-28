@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/stores';
+	import { browser } from '$app/environment';
 	import { config, initializeMasses } from '$lib/config';
 	import SimulationCanvas from '$lib/components/SimulationCanvas.svelte';
 	import PhysicsSimulation from '$lib/components/PhysicsSimulation.svelte';
@@ -10,7 +11,7 @@
 	let width, height, centerX, centerY, orbitRadius;
 
 	$: scenario = $page.params.scenario || 'N';
-	$: n = parseInt($page.url.searchParams.get('n')) || 3;
+	$: n = browser ? parseInt($page.url.searchParams.get('n')) || 3 : 3;
 	$: if (canvas) {
 		masses = initializeMasses(centerX, centerY, orbitRadius, scenario, n);
 	}
