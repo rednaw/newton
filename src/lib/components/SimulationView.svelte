@@ -39,6 +39,16 @@
 		lastInitializedN = null;
 	}
 
+	function initializeIfNeeded(nValue) {
+		const needsReinit = lastInitializedG !== currentG || lastInitializedN !== nValue || masses.length === 0;
+		if (needsReinit) {
+			masses = initializeMasses(centerX, centerY, orbitRadius, scenario, nValue, currentG);
+			lastInitializedG = currentG;
+			lastInitializedN = nValue;
+			initializationError = null;
+		}
+	}
+
 	$: if (canvas && scenarioMetadata && !error) {
 		try {
 			if (scenarioMetadata.requiresN) {
@@ -47,24 +57,10 @@
 					initializationError = nValidation.error;
 					resetErrorState();
 				} else {
-					const nValue = nValidation.value;
-					const needsReinit = lastInitializedG !== currentG || lastInitializedN !== nValue || masses.length === 0;
-					if (needsReinit) {
-						masses = initializeMasses(centerX, centerY, orbitRadius, scenario, nValue, currentG);
-						lastInitializedG = currentG;
-						lastInitializedN = nValue;
-						initializationError = null;
-					}
+					initializeIfNeeded(nValidation.value);
 				}
 			} else {
-				const nValue = scenarioMetadata.defaultN;
-				const needsReinit = lastInitializedG !== currentG || lastInitializedN !== nValue || masses.length === 0;
-				if (needsReinit) {
-					masses = initializeMasses(centerX, centerY, orbitRadius, scenario, nValue, currentG);
-					lastInitializedG = currentG;
-					lastInitializedN = nValue;
-					initializationError = null;
-				}
+				initializeIfNeeded(scenarioMetadata.defaultN);
 			}
 		} catch (e) {
 			initializationError = e.message || 'Failed to initialize simulation';

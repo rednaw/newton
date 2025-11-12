@@ -1,3 +1,5 @@
+import { validateN } from './validation';
+
 export function parseRouteParams(page, browser) {
 	if (!browser) {
 		return {
@@ -18,18 +20,18 @@ export function parseRouteParams(page, browser) {
 		};
 	}
 
-	const parsed = parseInt(nParam, 10);
-	if (isNaN(parsed)) {
+	const nValidation = validateN(nParam);
+	if (!nValidation.valid) {
 		return {
 			scenario,
 			n: null,
-			nError: `Invalid number format: "${nParam}"`
+			nError: nValidation.error
 		};
 	}
 
 	return {
 		scenario,
-		n: parsed,
+		n: nValidation.value,
 		nError: null
 	};
 }
