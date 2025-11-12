@@ -54,12 +54,12 @@ export class Mass {
 	}
 }
 
-export function getForce(m1, m2, g, softening) {
+function calculateBaseForce(m1, m2, g, effectiveMass1, effectiveMass2, effectiveSoftening) {
 	if (!m1 || !m2) {
-		return { x: 0, y: 0 };
+		return null;
 	}
-	if (!isFinite(g) || g <= 0 || !isFinite(softening) || softening <= 0) {
-		return { x: 0, y: 0 };
+	if (!isFinite(g) || g <= 0 || !isFinite(effectiveSoftening) || effectiveSoftening <= 0) {
+		return null;
 	}
 
 	const dx = m2.pos.x - m1.pos.x;
@@ -67,30 +67,56 @@ export function getForce(m1, m2, g, softening) {
 	const distSq = dx * dx + dy * dy;
 
 	if (distSq === 0 || !isFinite(distSq)) {
-		return { x: 0, y: 0 };
+		return null;
 	}
 
 	const dist = Math.sqrt(distSq);
 
 	if (dist === 0 || !isFinite(dist)) {
-		return { x: 0, y: 0 };
+		return null;
 	}
 
-	const forceMag = (g * m1.mass * m2.mass) / (distSq + softening * softening);
+	const forceMag = (g * effectiveMass1 * effectiveMass2) / (distSq + effectiveSoftening * effectiveSoftening);
 
 	if (!isFinite(forceMag) || forceMag === 0) {
-		return { x: 0, y: 0 };
+		return null;
 	}
 
 	const forceX = (dx / dist) * forceMag;
 	const forceY = (dy / dist) * forceMag;
 
 	if (!isFinite(forceX) || !isFinite(forceY)) {
-		return { x: 0, y: 0 };
+		return null;
 	}
 
 	return {
 		x: forceX,
 		y: forceY
 	};
+}
+
+export function getForce(m1, m2, g, softening) {
+	const result = calculateBaseForce(m1, m2, g, m1.mass, m2.mass, softening);
+	return result || { x: 0, y: 0 };
+}
+
+export function getRelativisticForce(m1, m2, g, softening, relativisticFactor = 0.1) {
+	const v1Sq = m1.vel.x * m1.vel.x + m1.vel.y * m1.vel.y;
+	const v2Sq = m2.vel.x * m2.vel.x + m2.vel.y * m2.vel.y;
+
+	const gamma1Arg = 1 - relativisticFactor * v1Sq;
+	const gamma2Arg = 1 - relativisticFactor * v2Sq;
+
+	const gamma1 = gamma1Arg > 0 ? 1 / Math.sqrt(gamma1Arg) : 1;
+	const gamma2 = gamma2Arg > 0 ? 1 / Math.sqrt(gamma2Arg) : 1;
+
+	const m1Rel = m1.mass * gamma1;
+	const m2Rel = m2.mass * gamma2;
+
+	const maxVSq = Math.max(v1Sq, v2Sq);
+	const velocitySoftening = Math.max(0, (maxVSq - 500) * 0.1);
+	const effectiveSoftening = softening + velocitySoftening;
+
+	const result = calculateBaseForce(m1, m2, g, m1Rel, m2Rel, effectiveSoftening);
+	return result || { x: 0, y: 0 };
 }

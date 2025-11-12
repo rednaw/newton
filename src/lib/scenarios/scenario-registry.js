@@ -1,9 +1,11 @@
 import { nBodyScenario } from './n-body.js';
 import { solarScenario } from './solar.js';
+import { einsteinScenario } from './einstein.js';
 
 const scenarios = {
 	N: nBodyScenario,
-	solar: solarScenario
+	solar: solarScenario,
+	E: einsteinScenario
 };
 
 export function getScenarioConfig(scenario) {

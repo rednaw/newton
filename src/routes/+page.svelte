@@ -30,6 +30,17 @@
 				</p>
 			</div>
 		</a>
+
+		<a href={`${base}/E`} class="sim-card">
+			<div class="card-content">
+				<div class="icon einstein">E</div>
+				<h2>Einstein's Relativity</h2>
+				<p>
+					Explore N-body simulations with relativistic physics corrections. See how high-velocity
+					masses experience increased effective mass and modified gravitational interactions.
+				</p>
+			</div>
+		</a>
 	</div>
 </div>
 
@@ -113,6 +124,11 @@
 	.icon.solar {
 		background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 		font-size: 2.5rem;
+	}
+
+	.icon.einstein {
+		background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+		font-size: 2rem;
 	}
 
 	h2 {

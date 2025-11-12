@@ -1,11 +1,13 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
-	import { getForce } from '$lib/physics';
+	import { getPhysicsModel } from '$lib/physics-models';
 	import { physicsConfig } from '$lib/stores/physics-config';
 
 	export let masses = [];
 	export let onUpdate = () => {};
+	export let physicsModel = 'newtonian';
+	export let relativisticFactor = 0.1;
 
 	let animationFrame;
 	let lastTime = 0;
@@ -13,6 +15,9 @@
 
 	let currentConfig;
 	let unsubscribe;
+
+	$: model = getPhysicsModel(physicsModel);
+	$: modelParams = { relativisticFactor };
 
 	function updatePhysics(deltaTime) {
 		if (!currentConfig || masses.length === 0) return;
@@ -23,7 +28,13 @@
 			for (let i = 0; i < masses.length; i++) {
 				for (let j = 0; j < masses.length; j++) {
 					if (i !== j) {
-						const force = getForce(masses[i], masses[j], currentConfig.G, currentConfig.SOFTENING);
+						const force = model.getForce(
+							masses[i],
+							masses[j],
+							currentConfig.G,
+							currentConfig.SOFTENING,
+							modelParams
+						);
 						masses[i].applyForce(force);
 					}
 				}

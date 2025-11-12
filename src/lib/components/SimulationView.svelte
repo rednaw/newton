@@ -14,6 +14,8 @@
 	export let scenarioMetadata = null;
 
 	$: configUrl = `${base}/${scenario}`;
+	$: physicsModel = scenarioMetadata?.physicsModel || 'newtonian';
+	$: relativisticFactor = scenarioMetadata?.relativisticFactor;
 
 	let masses = [];
 	let canvas, ctx;
@@ -73,6 +75,8 @@
 
 	<PhysicsSimulation
 		{masses}
+		{physicsModel}
+		{relativisticFactor}
 		onUpdate={() => {
 			if (massRenderer) {
 				massRenderer.triggerRender();
@@ -80,5 +84,11 @@
 		}}
 	/>
 
-	<MassRenderer bind:this={massRenderer} {ctx} {masses} />
+	<MassRenderer
+		bind:this={massRenderer}
+		{ctx}
+		{masses}
+		{physicsModel}
+		{relativisticFactor}
+	/>
 {/if}
