@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import { base } from '$app/paths';
-	import { getScenarioMetadata } from '$lib/config';
+	import { getScenarioMetadata } from '$lib/scenarios/scenario-metadata.js';
 	import { parseRouteParams } from '$lib/utils/route-params';
 	import ErrorDisplay from '$lib/components/ErrorDisplay.svelte';
 	import BackButton from '$lib/components/BackButton.svelte';

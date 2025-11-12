@@ -1,23 +1,5 @@
-import { Mass } from './physics';
-import { scenarios } from './scenarios';
-
-function getScenarioConfig(scenario) {
-	const scenarioConfig = scenarios[scenario];
-	if (!scenarioConfig) {
-		throw new Error(`Unknown scenario: ${scenario}`);
-	}
-	return scenarioConfig;
-}
-
-export function getScenarioMetadata(scenario) {
-	const scenarioConfig = getScenarioConfig(scenario);
-	const requiresN =
-		typeof scenarioConfig.masses === 'function' && scenarioConfig.masses.length === 1;
-	return {
-		requiresN,
-		defaultN: 3
-	};
-}
+import { Mass } from '../physics.js';
+import { getScenarioConfig } from './scenario-registry.js';
 
 export function getScenario(scenario, n = 3) {
 	const scenarioConfig = getScenarioConfig(scenario);
@@ -76,3 +58,4 @@ export function initializeMasses(centerX, centerY, orbitRadius, scenario, n = 3,
 
 	return masses;
 }
+

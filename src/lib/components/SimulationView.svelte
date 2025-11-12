@@ -1,5 +1,6 @@
 <script>
-	import { initializeMasses, getScenarioMetadata } from '$lib/config';
+	import { initializeMasses } from '$lib/scenarios/scenario-factory.js';
+	import { getScenarioMetadata } from '$lib/scenarios/scenario-metadata.js';
 	import { validateN } from '$lib/utils/validation';
 	import { physicsConfig } from '$lib/stores/physics-config';
 	import ErrorDisplay from '$lib/components/ErrorDisplay.svelte';
