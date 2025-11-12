@@ -3,7 +3,6 @@ const RADIUS = 20;
 const COLOR_SATURATION = 70;
 const COLOR_LIGHTNESS = 60;
 const VELOCITY_MULTIPLIER = 0.2;
-const BASE_MASS = 1000;
 
 export const nBodyScenario = {
 	requiresN: true,
@@ -39,6 +38,6 @@ export const nBodyScenario = {
 		return velocities;
 	},
 	getBaseVelocity: (orbitRadius, G) =>
-		Math.sqrt((G * BASE_MASS) / orbitRadius) * VELOCITY_MULTIPLIER
+		Math.sqrt((G * MASS) / orbitRadius) * VELOCITY_MULTIPLIER
 };
 

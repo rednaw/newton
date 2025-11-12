@@ -3,14 +3,14 @@ const RADII = [40, 16, 14, 12, 10, 8];
 const COLORS = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeead'];
 const INNER_ORBIT_RADIUS_MULTIPLIER = 0.35;
 const OUTER_ORBIT_RADIUS_MULTIPLIER = 0.65;
-const MOON1_OFFSET = 35;
-const MOON2_OFFSET = 40;
-const MOON3_OFFSET = -40;
+const PLANET1_OFFSET = 35;
+const PLANET2_OFFSET = 40;
+const PLANET3_OFFSET = -40;
 const INNER_ORBIT_VELOCITY_MULTIPLIER = 0.35;
 const OUTER_ORBIT_VELOCITY_MULTIPLIER = 0.25;
-const MOON1_VELOCITY_MULTIPLIER = 0.08;
-const MOON2_VELOCITY_MULTIPLIER = 0.06;
-const MOON3_VELOCITY_MULTIPLIER = 0.06;
+const PLANET1_VELOCITY_MULTIPLIER = 0.08;
+const PLANET2_VELOCITY_MULTIPLIER = 0.06;
+const PLANET3_VELOCITY_MULTIPLIER = 0.06;
 const BASE_MASS = 1000;
 const VELOCITY_MULTIPLIER = 0.008;
 
@@ -30,24 +30,24 @@ export const solarScenario = {
 			y: centerY
 		},
 		{
-			x: centerX + orbitRadius * INNER_ORBIT_RADIUS_MULTIPLIER + MOON1_OFFSET,
+			x: centerX + orbitRadius * INNER_ORBIT_RADIUS_MULTIPLIER + PLANET1_OFFSET,
 			y: centerY
 		},
 		{
-			x: centerX + orbitRadius * OUTER_ORBIT_RADIUS_MULTIPLIER + MOON2_OFFSET,
+			x: centerX + orbitRadius * OUTER_ORBIT_RADIUS_MULTIPLIER + PLANET2_OFFSET,
 			y: centerY
 		},
 		{
-			x: centerX + orbitRadius * OUTER_ORBIT_RADIUS_MULTIPLIER + MOON3_OFFSET,
+			x: centerX + orbitRadius * OUTER_ORBIT_RADIUS_MULTIPLIER + PLANET3_OFFSET,
 			y: centerY
 		}
 	],
 	initialVelocities: (baseVelocity) => () => {
 		const v1 = baseVelocity * INNER_ORBIT_VELOCITY_MULTIPLIER;
 		const v2 = baseVelocity * OUTER_ORBIT_VELOCITY_MULTIPLIER;
-		const vm1 = baseVelocity * MOON1_VELOCITY_MULTIPLIER;
-		const vm2 = baseVelocity * MOON2_VELOCITY_MULTIPLIER;
-		const vm3 = baseVelocity * MOON3_VELOCITY_MULTIPLIER;
+		const vm1 = baseVelocity * PLANET1_VELOCITY_MULTIPLIER;
+		const vm2 = baseVelocity * PLANET2_VELOCITY_MULTIPLIER;
+		const vm3 = baseVelocity * PLANET3_VELOCITY_MULTIPLIER;
 
 		return [
 			{ x: 0, y: 0 },
