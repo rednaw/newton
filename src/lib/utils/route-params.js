@@ -11,7 +11,7 @@ export function parseRouteParams(page, browser) {
 
 	const scenario = page.params.scenario || 'N';
 	const nParam = page.url.searchParams.get('n');
-	
+
 	if (nParam === null) {
 		return {
 			scenario,
@@ -35,4 +35,3 @@ export function parseRouteParams(page, browser) {
 		nError: null
 	};
 }
-

@@ -10,4 +10,3 @@
 </script>
 
 <SimulationView {scenario} {n} />
-

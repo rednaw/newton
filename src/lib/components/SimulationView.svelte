@@ -40,7 +40,8 @@
 	}
 
 	function initializeIfNeeded(nValue) {
-		const needsReinit = lastInitializedG !== currentG || lastInitializedN !== nValue || masses.length === 0;
+		const needsReinit =
+			lastInitializedG !== currentG || lastInitializedN !== nValue || masses.length === 0;
 		if (needsReinit) {
 			masses = initializeMasses(centerX, centerY, orbitRadius, scenario, nValue, currentG);
 			lastInitializedG = currentG;
@@ -76,20 +77,16 @@
 {:else}
 	<BackButton />
 
-	<SimulationCanvas 
-		bind:canvas 
-		bind:ctx 
-		bind:centerX 
-		bind:centerY 
-		bind:orbitRadius 
-	/>
+	<SimulationCanvas bind:canvas bind:ctx bind:centerX bind:centerY bind:orbitRadius />
 
-	<PhysicsSimulation {masses} onUpdate={() => {
-		if (massRenderer) {
-			massRenderer.triggerRender();
-		}
-	}} />
+	<PhysicsSimulation
+		{masses}
+		onUpdate={() => {
+			if (massRenderer) {
+				massRenderer.triggerRender();
+			}
+		}}
+	/>
 
 	<MassRenderer bind:this={massRenderer} {ctx} {masses} />
 {/if}
-

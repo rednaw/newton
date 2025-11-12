@@ -7,13 +7,16 @@
 		<h1>Newton's N-Body Simulation</h1>
 		<p class="subtitle">Explore gravitational interactions in real-time</p>
 	</div>
-	
+
 	<div class="simulations">
 		<a href={`${base}/N`} class="sim-card">
 			<div class="card-content">
 				<div class="icon">N</div>
 				<h2>N-Body Simulation</h2>
-				<p>Configure and run custom N-body gravitational simulations with 2 to 1000 bodies. Watch as masses interact through gravitational forces.</p>
+				<p>
+					Configure and run custom N-body gravitational simulations with 2 to 1000 bodies. Watch as
+					masses interact through gravitational forces.
+				</p>
 			</div>
 		</a>
 
@@ -21,7 +24,10 @@
 			<div class="card-content">
 				<div class="icon solar">☉</div>
 				<h2>Solar System</h2>
-				<p>Experience a simplified solar system simulation with a central star and five orbiting bodies, each with unique masses and velocities.</p>
+				<p>
+					Experience a simplified solar system simulation with a central star and five orbiting
+					bodies, each with unique masses and velocities.
+				</p>
 			</div>
 		</a>
 	</div>

@@ -14,10 +14,10 @@
 	$: scenario = routeParams.scenario;
 	$: n = routeParams.n;
 	$: nError = routeParams.nError;
-	
+
 	$: pathname = browser ? $page.url.pathname : '';
 	$: isSimRoute = pathname.endsWith('/sim');
-	
+
 	let scenarioMetadata = null;
 	let scenarioError = null;
 
@@ -30,27 +30,34 @@
 			scenarioMetadata = null;
 		}
 	}
-	
+
 	let redirectHandled = false;
-	
+
 	function handleLegacyRedirect() {
-		if (!browser || isSimRoute || n === null || !scenarioMetadata || scenarioError || redirectHandled) {
+		if (
+			!browser ||
+			isSimRoute ||
+			n === null ||
+			!scenarioMetadata ||
+			scenarioError ||
+			redirectHandled
+		) {
 			return;
 		}
 		redirectHandled = true;
 		goto(`${base}/${scenario}/sim?n=${n}`, { replaceState: true });
 	}
-	
+
 	afterNavigate(() => {
 		handleLegacyRedirect();
 	});
-	
+
 	$: viewMode = (() => {
 		if (scenarioError || nError) return 'error';
 		if (scenarioMetadata?.requiresN && n === null) return 'config';
 		return 'simulation';
 	})();
-	
+
 	$: errorMessage = scenarioError || nError;
 </script>
 
@@ -61,4 +68,4 @@
 	<SimulationConfig {scenario} {scenarioMetadata} />
 {:else}
 	<SimulationView {scenario} {n} />
-{/if} 
+{/if}
