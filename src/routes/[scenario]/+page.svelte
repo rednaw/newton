@@ -1,5 +1,5 @@
 <script>
-	import { afterNavigate, goto } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import { base } from '$app/paths';
@@ -15,8 +15,7 @@
 	$: n = routeParams.n;
 	$: nError = routeParams.nError;
 
-	$: pathname = browser ? $page.url.pathname : '';
-	$: isSimRoute = pathname.endsWith('/sim');
+	$: showSimulation = browser && $page.url.searchParams.get('sim') === 'true';
 
 	let scenarioMetadata = null;
 	let scenarioError = null;
@@ -31,29 +30,9 @@
 		}
 	}
 
-	let redirectHandled = false;
-
-	function handleLegacyRedirect() {
-		if (
-			!browser ||
-			isSimRoute ||
-			n === null ||
-			!scenarioMetadata ||
-			scenarioError ||
-			redirectHandled
-		) {
-			return;
-		}
-		redirectHandled = true;
-		goto(`${base}/${scenario}/sim?n=${n}`, { replaceState: true });
-	}
-
-	afterNavigate(() => {
-		handleLegacyRedirect();
-	});
-
 	$: viewMode = (() => {
 		if (scenarioError || nError) return 'error';
+		if (!showSimulation) return 'config';
 		if (scenarioMetadata?.requiresN && n === null) return 'config';
 		return 'simulation';
 	})();
@@ -67,5 +46,5 @@
 	<BackButton />
 	<SimulationConfig {scenario} {scenarioMetadata} />
 {:else}
-	<SimulationView {scenario} {n} />
+	<SimulationView {scenario} {n} {scenarioMetadata} />
 {/if}

@@ -4,13 +4,14 @@
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
 	import { validatePhysicsParams, validateN } from '$lib/utils/validation';
+	import { DEFAULT_N } from '$lib/scenarios/scenario-metadata.js';
 
 	export let scenario;
 	export let scenarioMetadata;
 
 	let physicsParams = { G: 500, DT: 0.1, SOFTENING: 100 };
 	let validationErrors = {};
-	let nBodies = 3;
+	let nBodies = DEFAULT_N;
 	let initialized = false;
 
 	onMount(() => {
@@ -23,7 +24,9 @@
 	});
 
 	$: if (scenarioMetadata && !initialized) {
-		nBodies = scenarioMetadata.defaultN;
+		if (scenarioMetadata.requiresN) {
+			nBodies = DEFAULT_N;
+		}
 		initialized = true;
 	}
 
@@ -53,7 +56,7 @@
 			SOFTENING: Number(physicsParams.SOFTENING)
 		});
 
-		const url = `${base}/${scenario}/sim${scenarioMetadata.requiresN ? `?n=${nBodies}` : ''}`;
+		const url = `${base}/${scenario}?sim=true${scenarioMetadata.requiresN ? `&n=${nBodies}` : ''}`;
 		goto(url);
 	}
 </script>

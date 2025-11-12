@@ -1,7 +1,8 @@
 import { Mass } from '../physics.js';
 import { getScenarioConfig } from './scenario-registry.js';
+import { DEFAULT_N } from './scenario-metadata.js';
 
-export function getScenario(scenario, n = 3) {
+export function getScenario(scenario, n = DEFAULT_N) {
 	const scenarioConfig = getScenarioConfig(scenario);
 	return {
 		...scenarioConfig,
@@ -14,7 +15,7 @@ export function getScenario(scenario, n = 3) {
 	};
 }
 
-export function initializeMasses(centerX, centerY, orbitRadius, scenario, n = 3, G = 500) {
+export function initializeMasses(centerX, centerY, orbitRadius, scenario, n = DEFAULT_N, G = 500) {
 	if (
 		typeof centerX !== 'number' ||
 		typeof centerY !== 'number' ||

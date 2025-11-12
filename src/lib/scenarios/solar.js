@@ -15,6 +15,7 @@ const BASE_MASS = 1000;
 const VELOCITY_MULTIPLIER = 0.008;
 
 export const solarScenario = {
+	requiresN: false,
 	masses: () => MASSES,
 	radii: () => RADII,
 	colors: () => COLORS,

@@ -14,7 +14,3 @@ export function getScenarioConfig(scenario) {
 	return scenarioConfig;
 }
 
-export function getAllScenarios() {
-	return Object.keys(scenarios);
-}
-

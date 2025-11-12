@@ -1,6 +1,5 @@
 <script>
 	import { initializeMasses } from '$lib/scenarios/scenario-factory.js';
-	import { getScenarioMetadata } from '$lib/scenarios/scenario-metadata.js';
 	import { validateN } from '$lib/utils/validation';
 	import { physicsConfig } from '$lib/stores/physics-config';
 	import ErrorDisplay from '$lib/components/ErrorDisplay.svelte';
@@ -11,24 +10,13 @@
 
 	export let scenario;
 	export let n = null;
+	export let scenarioMetadata = null;
 
 	let masses = [];
 	let canvas, ctx;
 	let centerX, centerY, orbitRadius;
-	let error = null;
-	let scenarioMetadata = null;
 	let initializationError = null;
 	let massRenderer;
-
-	$: {
-		try {
-			scenarioMetadata = getScenarioMetadata(scenario);
-			error = null;
-		} catch (e) {
-			error = `Invalid scenario: ${scenario}. Please use a valid scenario.`;
-			scenarioMetadata = null;
-		}
-	}
 
 	$: currentG = $physicsConfig.G;
 	let lastInitializedG = null;
@@ -51,10 +39,10 @@
 		}
 	}
 
-	$: if (canvas && scenarioMetadata && !error) {
+	$: if (canvas && scenarioMetadata) {
 		try {
 			if (scenarioMetadata.requiresN) {
-				const nValidation = validateN(n ?? scenarioMetadata.defaultN);
+				const nValidation = validateN(n);
 				if (!nValidation.valid) {
 					initializationError = nValidation.error;
 					resetErrorState();
@@ -62,7 +50,7 @@
 					initializeIfNeeded(nValidation.value);
 				}
 			} else {
-				initializeIfNeeded(scenarioMetadata.defaultN);
+				initializeIfNeeded(null);
 			}
 		} catch (e) {
 			initializationError = e.message || 'Failed to initialize simulation';
@@ -70,7 +58,7 @@
 		}
 	}
 
-	$: displayError = error || initializationError;
+	$: displayError = initializationError;
 </script>
 
 {#if displayError}

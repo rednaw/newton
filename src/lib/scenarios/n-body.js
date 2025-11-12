@@ -6,6 +6,7 @@ const VELOCITY_MULTIPLIER = 0.2;
 const BASE_MASS = 1000;
 
 export const nBodyScenario = {
+	requiresN: true,
 	masses: (n) => Array(n).fill(MASS),
 	radii: (n) => Array(n).fill(RADIUS),
 	colors: (n) =>
