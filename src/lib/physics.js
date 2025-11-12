@@ -1,4 +1,4 @@
-import { config, getScenario } from './config';
+import { config } from './config';
 
 export class Mass {
     constructor(mass, radius, color, pos, vel) {
@@ -30,8 +30,6 @@ export function getForce(m1, m2) {
     const dy = m2.pos.y - m1.pos.y;
     const distSq = dx * dx + dy * dy;
     const dist = Math.sqrt(distSq);
-    
-    // Use softened gravitational force
     const forceMag = (config.G * m1.mass * m2.mass) / 
         (distSq + config.SOFTENING * config.SOFTENING);
     

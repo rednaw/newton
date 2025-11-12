@@ -4,7 +4,7 @@ import { scenarios } from './scenarios';
 
 export const config = {
     ...physicsConfig,
-    scenario: 'N'              // Default scenario
+    scenario: 'N'
 };
 
 export function getScenario(scenario, n = 3) {

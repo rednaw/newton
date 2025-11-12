@@ -1,65 +1,30 @@
 <script>
-	import { config, initializeMasses } from '$lib/config';
-	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
-
-	let physicsParams = {
-		G: config.G,
-		DT: config.DT,
-		SOFTENING: config.SOFTENING
-	};
-
-	let nBodies = 3;
-
-	function startSimulation() {
-		config.G = physicsParams.G;
-		config.DT = physicsParams.DT;
-		config.SOFTENING = physicsParams.SOFTENING;
-		config.scenario = 'N';
-		goto(`${base}/N?n=${nBodies}`);
-	}
 </script>
 
 <div class="landing">
-	<h1>Newton's N-Body Simulation</h1>
-	
-	<div class="config-panel">
-		<div class="physics-params">
-			<h2>Physics Parameters</h2>
-			<div class="param-group">
-				<label>
-					Gravitational Constant (G):
-					<input type="number" bind:value={physicsParams.G} min="1" max="1000" step="10">
-				</label>
-			</div>
-			<div class="param-group">
-				<label>
-					Time Step (DT):
-					<input type="number" bind:value={physicsParams.DT} min="0.01" max="1" step="0.01">
-				</label>
-			</div>
-			<div class="param-group">
-				<label>
-					Softening Parameter:
-					<input type="number" bind:value={physicsParams.SOFTENING} min="1" max="1000" step="10">
-				</label>
-			</div>
-		</div>
-
-		<div class="scenario-config">
-			<h2>Simulation Configuration</h2>
-			<div class="param-group">
-				<label>
-					Number of Bodies (N):
-					<input type="number" bind:value={nBodies} min="2" max="1000" step="1">
-				</label>
-			</div>
-		</div>
+	<div class="hero">
+		<h1>Newton's N-Body Simulation</h1>
+		<p class="subtitle">Explore gravitational interactions in real-time</p>
 	</div>
+	
+	<div class="simulations">
+		<a href={`${base}/N`} class="sim-card">
+			<div class="card-content">
+				<div class="icon">N</div>
+				<h2>N-Body Simulation</h2>
+				<p>Configure and run custom N-body gravitational simulations with 2 to 1000 bodies. Watch as masses interact through gravitational forces.</p>
+			</div>
+		</a>
 
-	<button class="start-button" on:click={startSimulation}>
-		Start Simulation
-	</button>
+		<a href={`${base}/solar`} class="sim-card">
+			<div class="card-content">
+				<div class="icon solar">☉</div>
+				<h2>Solar System</h2>
+				<p>Experience a simplified solar system simulation with a central star and five orbiting bodies, each with unique masses and velocities.</p>
+			</div>
+		</a>
+	</div>
 </div>
 
 <style>
@@ -68,74 +33,106 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		padding: 2rem;
-		background: #111;
+		padding: 3rem 2rem;
+		background: linear-gradient(135deg, #111 0%, #1a1a2e 100%);
 		color: white;
+	}
+
+	.hero {
+		text-align: center;
+		margin-bottom: 4rem;
+		max-width: 800px;
 	}
 
 	h1 {
-		font-size: 2.5rem;
-		margin-bottom: 2rem;
-		text-align: center;
-	}
-
-	h2 {
-		font-size: 1.5rem;
+		font-size: 3.5rem;
 		margin-bottom: 1rem;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
 	}
 
-	.config-panel {
+	.subtitle {
+		font-size: 1.25rem;
+		color: #aaa;
+		margin: 0;
+	}
+
+	.simulations {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
 		gap: 2rem;
 		width: 100%;
 		max-width: 1200px;
-		margin-bottom: 2rem;
 	}
 
-	.physics-params, .scenario-config {
+	.sim-card {
 		background: #222;
-		padding: 1.5rem;
-		border-radius: 8px;
+		border-radius: 16px;
+		padding: 2rem;
+		text-decoration: none;
+		color: white;
+		transition: all 0.3s ease;
+		border: 2px solid transparent;
+		display: block;
 	}
 
-	.param-group {
-		margin-bottom: 1rem;
+	.sim-card:hover {
+		transform: translateY(-8px);
+		box-shadow: 0 12px 40px rgba(102, 126, 234, 0.3);
+		border-color: #667eea;
+		background: #2a2a3e;
 	}
 
-	label {
+	.card-content {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
+		gap: 1rem;
 	}
 
-	input[type="number"] {
-		background: #333;
-		border: 1px solid #444;
+	.icon {
+		width: 60px;
+		height: 60px;
+		border-radius: 12px;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 2rem;
+		font-weight: bold;
+		margin-bottom: 0.5rem;
+	}
+
+	.icon.solar {
+		background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+		font-size: 2.5rem;
+	}
+
+	h2 {
+		font-size: 1.75rem;
+		margin: 0;
 		color: white;
-		padding: 0.5rem;
-		border-radius: 4px;
-		width: 100%;
 	}
 
-	.start-button {
-		background: #4CAF50;
-		color: white;
-		border: none;
-		padding: 1rem 2rem;
-		font-size: 1.2rem;
-		border-radius: 6px;
-		cursor: pointer;
-		transition: background-color 0.2s;
-	}
-
-	.start-button:hover {
-		background: #45a049;
+	.card-content p {
+		color: #ccc;
+		line-height: 1.6;
+		margin: 0;
+		font-size: 1rem;
 	}
 
 	@media (max-width: 768px) {
-		.config-panel {
+		h1 {
+			font-size: 2.5rem;
+		}
+
+		.simulations {
 			grid-template-columns: 1fr;
+		}
+
+		.landing {
+			padding: 2rem 1rem;
 		}
 	}
 </style>
