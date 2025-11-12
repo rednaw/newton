@@ -25,10 +25,18 @@
         ctx.stroke();
     }
 
-    $: if (ctx && masses) {
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        for (const mass of masses) {
-            drawMass(mass);
+    let renderTrigger = 0;
+    
+    export function triggerRender() {
+        renderTrigger++;
+    }
+    
+    $: if (ctx && masses && renderTrigger >= 0) {
+        if (masses.length > 0) {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            for (const mass of masses) {
+                drawMass(mass);
+            }
         }
     }
 </script> 

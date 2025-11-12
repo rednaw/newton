@@ -1,4 +1,5 @@
 <script>
+	import { onMount } from 'svelte';
 	import { physicsConfig } from '$lib/stores/physics-config';
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
@@ -10,16 +11,22 @@
 	let physicsParams = { G: 500, DT: 0.1, SOFTENING: 100 };
 	let validationErrors = {};
 	let nBodies = 3;
+	let initialized = false;
 	
-	$: {
+	onMount(() => {
 		const config = $physicsConfig;
 		physicsParams.G = config.G;
 		physicsParams.DT = config.DT;
 		physicsParams.SOFTENING = config.SOFTENING;
-	}
+		if (scenarioMetadata && !initialized) {
+			nBodies = scenarioMetadata.defaultN;
+			initialized = true;
+		}
+	});
 	
-	$: if (scenarioMetadata) {
+	$: if (scenarioMetadata && !initialized) {
 		nBodies = scenarioMetadata.defaultN;
+		initialized = true;
 	}
 
 	function startSimulation() {

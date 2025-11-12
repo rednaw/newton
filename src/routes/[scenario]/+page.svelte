@@ -37,10 +37,13 @@
 	}
 	
 	// Handle redirect for backward compatibility (old URLs with ?n= parameter)
+	let redirectHandled = false;
+	
 	function handleLegacyRedirect() {
-		if (!browser || isSimRoute || n === null || !scenarioMetadata || scenarioError) {
+		if (!browser || isSimRoute || n === null || !scenarioMetadata || scenarioError || redirectHandled) {
 			return;
 		}
+		redirectHandled = true;
 		goto(`${base}/${scenario}/sim?n=${n}`, { replaceState: true });
 	}
 	

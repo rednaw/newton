@@ -18,6 +18,7 @@
 	let scenarioMetadata = null;
 	let initializationError = null;
 	let currentG = 500;
+	let massRenderer;
 
 	$: {
 		try {
@@ -30,6 +31,8 @@
 	}
 
 	$: currentG = $physicsConfig.G;
+	let lastInitializedG = null;
+	let lastInitializedN = null;
 
 	$: if (canvas && scenarioMetadata && !error) {
 		try {
@@ -39,19 +42,33 @@
 				if (!nValidation.valid) {
 					initializationError = nValidation.error;
 					masses = [];
+					lastInitializedG = null;
+					lastInitializedN = null;
 				} else {
 					nValue = nValidation.value;
-					masses = initializeMasses(centerX, centerY, orbitRadius, scenario, nValue, currentG);
-					initializationError = null;
+					const needsReinit = lastInitializedG !== currentG || lastInitializedN !== nValue || masses.length === 0;
+					if (needsReinit) {
+						masses = initializeMasses(centerX, centerY, orbitRadius, scenario, nValue, currentG);
+						lastInitializedG = currentG;
+						lastInitializedN = nValue;
+						initializationError = null;
+					}
 				}
 			} else {
 				nValue = scenarioMetadata.defaultN;
-				masses = initializeMasses(centerX, centerY, orbitRadius, scenario, nValue, currentG);
-				initializationError = null;
+				const needsReinit = lastInitializedG !== currentG || lastInitializedN !== nValue || masses.length === 0;
+				if (needsReinit) {
+					masses = initializeMasses(centerX, centerY, orbitRadius, scenario, nValue, currentG);
+					lastInitializedG = currentG;
+					lastInitializedN = nValue;
+					initializationError = null;
+				}
 			}
 		} catch (e) {
 			initializationError = e.message || 'Failed to initialize simulation';
 			masses = [];
+			lastInitializedG = null;
+			lastInitializedN = null;
 		}
 	}
 
@@ -73,8 +90,12 @@
 		bind:orbitRadius 
 	/>
 
-	<PhysicsSimulation {masses} onUpdate={(newMasses) => masses = newMasses} />
+	<PhysicsSimulation {masses} onUpdate={() => {
+		if (massRenderer) {
+			massRenderer.triggerRender();
+		}
+	}} />
 
-	<MassRenderer {ctx} {masses} />
+	<MassRenderer bind:this={massRenderer} {ctx} {masses} />
 {/if}
 
