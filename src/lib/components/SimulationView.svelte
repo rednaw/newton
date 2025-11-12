@@ -2,6 +2,7 @@
 	import { initializeMasses } from '$lib/scenarios/scenario-factory.js';
 	import { validateN } from '$lib/utils/validation';
 	import { physicsConfig } from '$lib/stores/physics-config';
+	import { base } from '$app/paths';
 	import ErrorDisplay from '$lib/components/ErrorDisplay.svelte';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import SimulationCanvas from '$lib/components/SimulationCanvas.svelte';
@@ -11,6 +12,8 @@
 	export let scenario;
 	export let n = null;
 	export let scenarioMetadata = null;
+
+	$: configUrl = `${base}/${scenario}`;
 
 	let masses = [];
 	let canvas, ctx;
@@ -64,7 +67,7 @@
 {#if displayError}
 	<ErrorDisplay error={displayError} />
 {:else}
-	<BackButton />
+	<BackButton target={configUrl} />
 
 	<SimulationCanvas bind:canvas bind:ctx bind:centerX bind:centerY bind:orbitRadius />
 

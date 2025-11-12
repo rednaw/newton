@@ -2,12 +2,15 @@
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
 
-	function goHome() {
-		goto(`${base}/`);
+	export let target = null;
+
+	function goBack() {
+		const url = target || `${base}/`;
+		goto(url);
 	}
 </script>
 
-<button class="back-button" on:click={goHome} aria-label="Back to home">
+<button class="back-button" on:click={goBack} aria-label="Go back">
 	<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<path
 			d="M19 12H5M5 12L12 19M5 12L12 5"
