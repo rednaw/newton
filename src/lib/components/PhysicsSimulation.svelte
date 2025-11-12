@@ -2,6 +2,7 @@
     import { onMount, onDestroy } from 'svelte';
     import { browser } from '$app/environment';
     import { getForce } from '$lib/physics';
+    import { physicsConfig } from '$lib/stores/physics-config';
 
     export let masses = [];
     export let onUpdate = () => {};
@@ -9,6 +10,9 @@
     let animationFrame;
     let lastTime = 0;
     const FIXED_TIME_STEP = 1/60;
+    
+    let currentConfig = { G: 500, DT: 0.1, SOFTENING: 100 };
+    let unsubscribe;
 
     function updatePhysics(deltaTime) {
         const steps = Math.min(Math.floor(deltaTime / FIXED_TIME_STEP), 3);
@@ -17,13 +21,13 @@
             for (let i = 0; i < masses.length; i++) {
                 for (let j = 0; j < masses.length; j++) {
                     if (i !== j) {
-                        const force = getForce(masses[i], masses[j]);
+                        const force = getForce(masses[i], masses[j], currentConfig.G, currentConfig.SOFTENING);
                         masses[i].applyForce(force);
                     }
                 }
             }
             for (const m of masses) {
-                m.update();
+                m.update(currentConfig.DT);
             }
         }
         
@@ -45,12 +49,18 @@
         if (browser) {
             lastTime = performance.now();
             animationFrame = requestAnimationFrame(loop);
+            unsubscribe = physicsConfig.subscribe(value => {
+                currentConfig = value;
+            });
         }
     });
 
     onDestroy(() => {
         if (browser) {
             cancelAnimationFrame(animationFrame);
+        }
+        if (unsubscribe) {
+            unsubscribe();
         }
     });
 </script> 

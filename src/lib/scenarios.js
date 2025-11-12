@@ -1,5 +1,3 @@
-import { physicsConfig } from './physics-config';
-
 export const scenarios = {
     'N': {
         masses: (n) => Array(n).fill(1000),
@@ -29,7 +27,7 @@ export const scenarios = {
             }
             return velocities;
         },
-        getBaseVelocity: (orbitRadius) => Math.sqrt(physicsConfig.G * 1000 / orbitRadius) * 0.2
+        getBaseVelocity: (orbitRadius, G) => Math.sqrt(G * 1000 / orbitRadius) * 0.2
     },
     'solar': {
         masses: () => [3000, 80, 60, 40, 30, 20],
@@ -59,6 +57,6 @@ export const scenarios = {
                 { x: 0, y: v2 - vm3 }
             ];
         },
-        getBaseVelocity: (orbitRadius) => Math.sqrt(physicsConfig.G * 1000 / orbitRadius) * 0.008
+        getBaseVelocity: (orbitRadius, G) => Math.sqrt(G * 1000 / orbitRadius) * 0.008
     }
 }; 

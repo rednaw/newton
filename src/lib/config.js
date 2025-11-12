@@ -1,18 +1,12 @@
 import { Mass } from './physics';
-import { physicsConfig } from './physics-config';
 import { scenarios } from './scenarios';
-
-export const config = {
-    ...physicsConfig,
-    scenario: 'N'
-};
 
 export function getScenarioMetadata(scenario) {
     const scenarioConfig = scenarios[scenario];
     if (!scenarioConfig) {
         throw new Error(`Unknown scenario: ${scenario}`);
     }
-    const requiresN = scenarioConfig.masses.length > 0;
+    const requiresN = typeof scenarioConfig.masses === 'function' && scenarioConfig.masses.length === 1;
     return {
         requiresN,
         defaultN: 3
@@ -35,15 +29,33 @@ export function getScenario(scenario, n = 3) {
     };
 }
 
-export function initializeMasses(centerX, centerY, orbitRadius, scenario, n = 3) {
+export function initializeMasses(centerX, centerY, orbitRadius, scenario, n = 3, G = 500) {
+    if (typeof centerX !== 'number' || typeof centerY !== 'number' || typeof orbitRadius !== 'number') {
+        throw new Error('Invalid canvas dimensions');
+    }
+    if (orbitRadius <= 0) {
+        throw new Error('Orbit radius must be positive');
+    }
+    
     const scenarioConfig = getScenario(scenario, n);
     const masses = [];
     const positions = scenarioConfig.initialPositions(centerX, centerY, orbitRadius)(n);
     
-    const baseVelocity = scenarioConfig.getBaseVelocity(orbitRadius);
+    if (!Array.isArray(positions) || positions.length !== scenarioConfig.masses.length) {
+        throw new Error('Position array length mismatch');
+    }
+    
+    const baseVelocity = scenarioConfig.getBaseVelocity(orbitRadius, G);
     const velocities = scenarioConfig.initialVelocities(baseVelocity)(n);
+    
+    if (!Array.isArray(velocities) || velocities.length !== scenarioConfig.masses.length) {
+        throw new Error('Velocity array length mismatch');
+    }
 
     for (let i = 0; i < scenarioConfig.masses.length; i++) {
+        if (scenarioConfig.masses[i] <= 0) {
+            throw new Error(`Invalid mass at index ${i}: must be positive`);
+        }
         masses.push(new Mass(
             scenarioConfig.masses[i],
             scenarioConfig.radii[i],

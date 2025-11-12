@@ -1,192 +1,65 @@
 <script>
+	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
-	import { config, initializeMasses, getScenarioMetadata } from '$lib/config';
+	import { getScenarioMetadata } from '$lib/config';
+	import { parseNParam } from '$lib/utils/validation';
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
+	import ErrorDisplay from '$lib/components/ErrorDisplay.svelte';
 	import BackButton from '$lib/components/BackButton.svelte';
-	import SimulationCanvas from '$lib/components/SimulationCanvas.svelte';
-	import PhysicsSimulation from '$lib/components/PhysicsSimulation.svelte';
-	import MassRenderer from '$lib/components/MassRenderer.svelte';
+	import SimulationConfig from '$lib/components/SimulationConfig.svelte';
+	import SimulationView from '$lib/components/SimulationView.svelte';
 
-	let masses = [];
-	let canvas, ctx;
-	let width, height, centerX, centerY, orbitRadius;
-
+	// Extract route parameters
 	$: scenario = $page.params.scenario || 'N';
-	$: scenarioMetadata = getScenarioMetadata(scenario);
+	$: pathname = browser ? $page.url.pathname : '';
+	$: isSimRoute = pathname.endsWith('/sim');
 	$: nParam = browser ? $page.url.searchParams.get('n') : null;
-	$: n = nParam !== null ? parseInt(nParam) : null;
-	$: hasStartParam = browser ? $page.url.searchParams.has('start') : false;
-	$: showConfig = scenarioMetadata?.requiresN && n === null && !hasStartParam;
 	
-	let physicsParams = {
-		G: config.G,
-		DT: config.DT,
-		SOFTENING: config.SOFTENING
-	};
+	// Parse and validate parameters
+	$: nResult = nParam !== null ? parseNParam(nParam) : { value: null, error: null };
+	$: n = nResult.value;
+	$: nError = nResult.error;
 	
-	let nBodies = 3;
-	
-	$: if (scenarioMetadata) {
-		nBodies = scenarioMetadata.defaultN;
-	}
+	// Load scenario metadata
+	let scenarioMetadata = null;
+	let scenarioError = null;
 
-	function startSimulation() {
-		if (!scenarioMetadata) return;
-		config.G = physicsParams.G;
-		config.DT = physicsParams.DT;
-		config.SOFTENING = physicsParams.SOFTENING;
-		const url = scenarioMetadata.requiresN 
-			? `${base}/${scenario}?n=${nBodies}`
-			: `${base}/${scenario}?start=true`;
-		goto(url);
+	$: {
+		try {
+			scenarioMetadata = getScenarioMetadata(scenario);
+			scenarioError = null;
+		} catch (e) {
+			scenarioError = `Invalid scenario: ${scenario}. Please use a valid scenario.`;
+			scenarioMetadata = null;
+		}
 	}
-
-	$: if (canvas && !showConfig && scenarioMetadata) {
-		const nValue = scenarioMetadata.requiresN ? (n ?? scenarioMetadata.defaultN) : scenarioMetadata.defaultN;
-		masses = initializeMasses(centerX, centerY, orbitRadius, scenario, nValue);
+	
+	// Handle redirect for backward compatibility (old URLs with ?n= parameter)
+	function handleLegacyRedirect() {
+		if (!browser || isSimRoute || n === null || !scenarioMetadata || scenarioError) {
+			return;
+		}
+		goto(`${base}/${scenario}/sim?n=${n}`, { replaceState: true });
 	}
+	
+	afterNavigate(() => {
+		handleLegacyRedirect();
+	});
+	
+	// Determine what to display
+	$: errorMessage = scenarioError || nError;
+	$: hasError = !!errorMessage;
+	$: shouldShowConfig = scenarioMetadata?.requiresN && n === null && !hasError;
+	$: viewMode = hasError ? 'error' : shouldShowConfig ? 'config' : 'simulation';
 </script>
 
-{#if showConfig}
+{#if viewMode === 'error'}
+	<ErrorDisplay error={errorMessage} />
+{:else if viewMode === 'config'}
 	<BackButton />
-
-	<div class="landing">
-		<h1>{scenario.charAt(0).toUpperCase() + scenario.slice(1)} Simulation Configuration</h1>
-		
-		<div class="config-panel">
-			<div class="physics-params">
-				<h2>Physics Parameters</h2>
-				<div class="param-group">
-					<label>
-						Gravitational Constant (G):
-						<input type="number" bind:value={physicsParams.G} min="1" max="1000" step="10">
-					</label>
-				</div>
-				<div class="param-group">
-					<label>
-						Time Step (DT):
-						<input type="number" bind:value={physicsParams.DT} min="0.01" max="1" step="0.01">
-					</label>
-				</div>
-				<div class="param-group">
-					<label>
-						Softening Parameter:
-						<input type="number" bind:value={physicsParams.SOFTENING} min="1" max="1000" step="10">
-					</label>
-				</div>
-			</div>
-
-			{#if scenarioMetadata?.requiresN}
-				<div class="scenario-config">
-					<h2>Simulation Configuration</h2>
-					<div class="param-group">
-						<label>
-							Number of Bodies (N):
-							<input type="number" bind:value={nBodies} min="2" max="1000" step="1">
-						</label>
-					</div>
-				</div>
-			{/if}
-		</div>
-
-		<button class="start-button" on:click={startSimulation}>
-			Start Simulation
-		</button>
-	</div>
-
-	<style>
-		.landing {
-			min-height: 100vh;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			padding: 2rem;
-			background: #111;
-			color: white;
-		}
-
-		h1 {
-			font-size: 2.5rem;
-			margin-bottom: 2rem;
-			text-align: center;
-		}
-
-		h2 {
-			font-size: 1.5rem;
-			margin-bottom: 1rem;
-		}
-
-		.config-panel {
-			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-			gap: 2rem;
-			width: 100%;
-			max-width: 1200px;
-			margin-bottom: 2rem;
-		}
-
-		.physics-params, .scenario-config {
-			background: #222;
-			padding: 1.5rem;
-			border-radius: 8px;
-		}
-
-		.param-group {
-			margin-bottom: 1rem;
-		}
-
-		label {
-			display: flex;
-			flex-direction: column;
-			gap: 0.5rem;
-		}
-
-		input[type="number"] {
-			background: #333;
-			border: 1px solid #444;
-			color: white;
-			padding: 0.5rem;
-			border-radius: 4px;
-			width: 100%;
-		}
-
-		.start-button {
-			background: #4CAF50;
-			color: white;
-			border: none;
-			padding: 1rem 2rem;
-			font-size: 1.2rem;
-			border-radius: 6px;
-			cursor: pointer;
-			transition: background-color 0.2s;
-		}
-
-		.start-button:hover {
-			background: #45a049;
-		}
-
-		@media (max-width: 768px) {
-			.config-panel {
-				grid-template-columns: 1fr;
-			}
-		}
-	</style>
-{:else}
-	<BackButton />
-
-	<SimulationCanvas 
-		bind:canvas 
-		bind:ctx 
-		bind:width 
-		bind:height 
-		bind:centerX 
-		bind:centerY 
-		bind:orbitRadius 
-	/>
-
-	<PhysicsSimulation {masses} onUpdate={(newMasses) => masses = newMasses} />
-
-	<MassRenderer {ctx} {masses} />
+	<SimulationConfig {scenario} {scenarioMetadata} />
+{:else if viewMode === 'simulation'}
+	<SimulationView {scenario} {n} />
 {/if} 
