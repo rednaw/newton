@@ -11,10 +11,12 @@
     let lastTime = 0;
     const FIXED_TIME_STEP = 1/60;
     
-    let currentConfig = { G: 500, DT: 0.1, SOFTENING: 100 };
+    let currentConfig;
     let unsubscribe;
 
     function updatePhysics(deltaTime) {
+        if (!currentConfig || masses.length === 0) return;
+        
         const steps = Math.min(Math.floor(deltaTime / FIXED_TIME_STEP), 3);
         
         for (let step = 0; step < steps; step++) {
@@ -35,22 +37,21 @@
     }
 
     function loop(currentTime) {
-        if (browser) {
-            const deltaTime = (currentTime - lastTime) / 1000;
-            lastTime = currentTime;
-            
-            updatePhysics(deltaTime);
-            animationFrame = requestAnimationFrame(loop);
-        }
+        const deltaTime = (currentTime - lastTime) / 1000;
+        lastTime = currentTime;
+        
+        updatePhysics(deltaTime);
+        animationFrame = requestAnimationFrame(loop);
     }
 
     onMount(() => {
         if (browser) {
-            lastTime = performance.now();
-            animationFrame = requestAnimationFrame(loop);
+            currentConfig = $physicsConfig;
             unsubscribe = physicsConfig.subscribe(value => {
                 currentConfig = value;
             });
+            lastTime = performance.now();
+            animationFrame = requestAnimationFrame(loop);
         }
     });
 
