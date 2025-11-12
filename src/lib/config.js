@@ -7,6 +7,18 @@ export const config = {
     scenario: 'N'
 };
 
+export function getScenarioMetadata(scenario) {
+    const scenarioConfig = scenarios[scenario];
+    if (!scenarioConfig) {
+        throw new Error(`Unknown scenario: ${scenario}`);
+    }
+    const requiresN = scenarioConfig.masses.length > 0;
+    return {
+        requiresN,
+        defaultN: 3
+    };
+}
+
 export function getScenario(scenario, n = 3) {
     const scenarioConfig = scenarios[scenario];
     if (!scenarioConfig) {

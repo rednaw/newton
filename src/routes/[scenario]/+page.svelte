@@ -1,7 +1,7 @@
 <script>
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
-	import { config, initializeMasses } from '$lib/config';
+	import { config, initializeMasses, getScenarioMetadata } from '$lib/config';
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
 	import BackButton from '$lib/components/BackButton.svelte';
@@ -14,26 +14,37 @@
 	let width, height, centerX, centerY, orbitRadius;
 
 	$: scenario = $page.params.scenario || 'N';
+	$: scenarioMetadata = getScenarioMetadata(scenario);
 	$: nParam = browser ? $page.url.searchParams.get('n') : null;
 	$: n = nParam !== null ? parseInt(nParam) : null;
-	$: showConfig = scenario === 'N' && n === null;
+	$: hasStartParam = browser ? $page.url.searchParams.has('start') : false;
+	$: showConfig = scenarioMetadata?.requiresN && n === null && !hasStartParam;
 	
 	let physicsParams = {
 		G: config.G,
 		DT: config.DT,
 		SOFTENING: config.SOFTENING
 	};
+	
 	let nBodies = 3;
+	
+	$: if (scenarioMetadata) {
+		nBodies = scenarioMetadata.defaultN;
+	}
 
 	function startSimulation() {
+		if (!scenarioMetadata) return;
 		config.G = physicsParams.G;
 		config.DT = physicsParams.DT;
 		config.SOFTENING = physicsParams.SOFTENING;
-		goto(`${base}/N?n=${nBodies}`);
+		const url = scenarioMetadata.requiresN 
+			? `${base}/${scenario}?n=${nBodies}`
+			: `${base}/${scenario}?start=true`;
+		goto(url);
 	}
 
-	$: if (canvas && !showConfig && (scenario !== 'N' || n !== null)) {
-		const nValue = scenario === 'N' ? (n || 3) : 3;
+	$: if (canvas && !showConfig && scenarioMetadata) {
+		const nValue = scenarioMetadata.requiresN ? (n ?? scenarioMetadata.defaultN) : scenarioMetadata.defaultN;
 		masses = initializeMasses(centerX, centerY, orbitRadius, scenario, nValue);
 	}
 </script>
@@ -42,7 +53,7 @@
 	<BackButton />
 
 	<div class="landing">
-		<h1>N-Body Simulation Configuration</h1>
+		<h1>{scenario.charAt(0).toUpperCase() + scenario.slice(1)} Simulation Configuration</h1>
 		
 		<div class="config-panel">
 			<div class="physics-params">
@@ -67,15 +78,17 @@
 				</div>
 			</div>
 
-			<div class="scenario-config">
-				<h2>Simulation Configuration</h2>
-				<div class="param-group">
-					<label>
-						Number of Bodies (N):
-						<input type="number" bind:value={nBodies} min="2" max="1000" step="1">
-					</label>
+			{#if scenarioMetadata?.requiresN}
+				<div class="scenario-config">
+					<h2>Simulation Configuration</h2>
+					<div class="param-group">
+						<label>
+							Number of Bodies (N):
+							<input type="number" bind:value={nBodies} min="2" max="1000" step="1">
+						</label>
+					</div>
 				</div>
-			</div>
+			{/if}
 		</div>
 
 		<button class="start-button" on:click={startSimulation}>
@@ -107,7 +120,7 @@
 
 		.config-panel {
 			display: grid;
-			grid-template-columns: 1fr 1fr;
+			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 			gap: 2rem;
 			width: 100%;
 			max-width: 1200px;
