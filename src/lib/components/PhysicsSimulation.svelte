@@ -13,7 +13,6 @@
     
     let currentConfig = { G: 500, DT: 0.1, SOFTENING: 100 };
     let unsubscribe;
-    let updateCounter = 0;
 
     function updatePhysics(deltaTime) {
         const steps = Math.min(Math.floor(deltaTime / FIXED_TIME_STEP), 3);
@@ -32,7 +31,6 @@
             }
         }
         
-        updateCounter++;
         onUpdate();
     }
 

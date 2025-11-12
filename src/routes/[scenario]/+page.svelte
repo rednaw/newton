@@ -1,28 +1,23 @@
 <script>
-	import { afterNavigate } from '$app/navigation';
+	import { afterNavigate, goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
-	import { getScenarioMetadata } from '$lib/config';
-	import { parseNParam } from '$lib/utils/validation';
-	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
+	import { getScenarioMetadata } from '$lib/config';
+	import { parseRouteParams } from '$lib/utils/route-params';
 	import ErrorDisplay from '$lib/components/ErrorDisplay.svelte';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import SimulationConfig from '$lib/components/SimulationConfig.svelte';
 	import SimulationView from '$lib/components/SimulationView.svelte';
 
-	// Extract route parameters
-	$: scenario = $page.params.scenario || 'N';
+	$: routeParams = parseRouteParams($page, browser);
+	$: scenario = routeParams.scenario;
+	$: n = routeParams.n;
+	$: nError = routeParams.nError;
+	
 	$: pathname = browser ? $page.url.pathname : '';
 	$: isSimRoute = pathname.endsWith('/sim');
-	$: nParam = browser ? $page.url.searchParams.get('n') : null;
 	
-	// Parse and validate parameters
-	$: nResult = nParam !== null ? parseNParam(nParam) : { value: null, error: null };
-	$: n = nResult.value;
-	$: nError = nResult.error;
-	
-	// Load scenario metadata
 	let scenarioMetadata = null;
 	let scenarioError = null;
 
@@ -36,7 +31,6 @@
 		}
 	}
 	
-	// Handle redirect for backward compatibility (old URLs with ?n= parameter)
 	let redirectHandled = false;
 	
 	function handleLegacyRedirect() {
@@ -51,7 +45,6 @@
 		handleLegacyRedirect();
 	});
 	
-	// Determine what to display
 	$: errorMessage = scenarioError || nError;
 	$: hasError = !!errorMessage;
 	$: shouldShowConfig = scenarioMetadata?.requiresN && n === null && !hasError;

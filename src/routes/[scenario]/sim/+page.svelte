@@ -1,13 +1,12 @@
 <script>
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
-	import { parseNParam } from '$lib/utils/validation';
+	import { parseRouteParams } from '$lib/utils/route-params';
 	import SimulationView from '$lib/components/SimulationView.svelte';
 
-	$: scenario = $page.params.scenario || 'N';
-	$: nParam = browser ? $page.url.searchParams.get('n') : null;
-	$: nResult = nParam !== null ? parseNParam(nParam) : { value: null, error: null };
-	$: n = nResult.value;
+	$: routeParams = parseRouteParams($page, browser);
+	$: scenario = routeParams.scenario;
+	$: n = routeParams.n;
 </script>
 
 <SimulationView {scenario} {n} />

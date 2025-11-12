@@ -1,11 +1,16 @@
 import { Mass } from './physics';
 import { scenarios } from './scenarios';
 
-export function getScenarioMetadata(scenario) {
+function getScenarioConfig(scenario) {
     const scenarioConfig = scenarios[scenario];
     if (!scenarioConfig) {
         throw new Error(`Unknown scenario: ${scenario}`);
     }
+    return scenarioConfig;
+}
+
+export function getScenarioMetadata(scenario) {
+    const scenarioConfig = getScenarioConfig(scenario);
     const requiresN = typeof scenarioConfig.masses === 'function' && scenarioConfig.masses.length === 1;
     return {
         requiresN,
@@ -14,10 +19,7 @@ export function getScenarioMetadata(scenario) {
 }
 
 export function getScenario(scenario, n = 3) {
-    const scenarioConfig = scenarios[scenario];
-    if (!scenarioConfig) {
-        throw new Error(`Unknown scenario: ${scenario}`);
-    }
+    const scenarioConfig = getScenarioConfig(scenario);
     return {
         ...scenarioConfig,
         masses: scenarioConfig.masses(n),

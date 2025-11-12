@@ -51,14 +51,4 @@ export function validatePhysicsParams(params) {
     };
 }
 
-export function parseNParam(nParam) {
-    if (nParam === null || nParam === undefined) {
-        return { value: null, error: null };
-    }
-    const parsed = parseInt(nParam, 10);
-    if (isNaN(parsed)) {
-        return { value: null, error: `Invalid number format: "${nParam}"` };
-    }
-    return { value: parsed, error: null };
-}
 

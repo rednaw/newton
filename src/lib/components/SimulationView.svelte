@@ -34,6 +34,12 @@
 	let lastInitializedG = null;
 	let lastInitializedN = null;
 
+	function resetErrorState() {
+		masses = [];
+		lastInitializedG = null;
+		lastInitializedN = null;
+	}
+
 	$: if (canvas && scenarioMetadata && !error) {
 		try {
 			let nValue;
@@ -41,9 +47,7 @@
 				const nValidation = validateN(n ?? scenarioMetadata.defaultN);
 				if (!nValidation.valid) {
 					initializationError = nValidation.error;
-					masses = [];
-					lastInitializedG = null;
-					lastInitializedN = null;
+					resetErrorState();
 				} else {
 					nValue = nValidation.value;
 					const needsReinit = lastInitializedG !== currentG || lastInitializedN !== nValue || masses.length === 0;
@@ -66,9 +70,7 @@
 			}
 		} catch (e) {
 			initializationError = e.message || 'Failed to initialize simulation';
-			masses = [];
-			lastInitializedG = null;
-			lastInitializedN = null;
+			resetErrorState();
 		}
 	}
 

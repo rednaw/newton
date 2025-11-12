@@ -18,10 +18,6 @@
 		physicsParams.G = config.G;
 		physicsParams.DT = config.DT;
 		physicsParams.SOFTENING = config.SOFTENING;
-		if (scenarioMetadata && !initialized) {
-			nBodies = scenarioMetadata.defaultN;
-			initialized = true;
-		}
 	});
 	
 	$: if (scenarioMetadata && !initialized) {
@@ -54,9 +50,8 @@
 			DT: Number(physicsParams.DT),
 			SOFTENING: Number(physicsParams.SOFTENING)
 		});
-		const url = scenarioMetadata.requiresN 
-			? `${base}/${scenario}/sim?n=${nBodies}`
-			: `${base}/${scenario}/sim`;
+		
+		const url = `${base}/${scenario}/sim${scenarioMetadata.requiresN ? `?n=${nBodies}` : ''}`;
 		goto(url);
 	}
 </script>
