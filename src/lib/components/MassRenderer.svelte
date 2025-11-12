@@ -31,12 +31,11 @@
         renderTrigger++;
     }
     
-    $: if (ctx && masses && renderTrigger >= 0) {
-        if (masses.length > 0) {
-            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-            for (const mass of masses) {
-                drawMass(mass);
-            }
+    $: if (ctx && masses && masses.length > 0) {
+        renderTrigger;
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        for (const mass of masses) {
+            drawMass(mass);
         }
     }
 </script> 
