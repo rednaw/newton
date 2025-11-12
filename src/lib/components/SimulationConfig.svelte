@@ -15,9 +15,11 @@
 	
 	onMount(() => {
 		const config = $physicsConfig;
-		physicsParams.G = config.G;
-		physicsParams.DT = config.DT;
-		physicsParams.SOFTENING = config.SOFTENING;
+		physicsParams = {
+			G: config.G,
+			DT: config.DT,
+			SOFTENING: config.SOFTENING
+		};
 	});
 	
 	$: if (scenarioMetadata && !initialized) {

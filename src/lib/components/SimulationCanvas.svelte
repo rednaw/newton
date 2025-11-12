@@ -2,8 +2,6 @@
     import { onMount, onDestroy } from 'svelte';
     import { browser } from '$app/environment';
 
-    export let width = 0;
-    export let height = 0;
     export let centerX = 0;
     export let centerY = 0;
     export let orbitRadius = 0;
@@ -15,8 +13,8 @@
         if (!canvas) return;
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        width = canvas.width;
-        height = canvas.height;
+        const width = canvas.width;
+        const height = canvas.height;
         centerX = width / 2;
         centerY = height / 2;
         orbitRadius = Math.min(width, height) * 0.3;

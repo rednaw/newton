@@ -45,10 +45,13 @@
 		handleLegacyRedirect();
 	});
 	
+	$: viewMode = (() => {
+		if (scenarioError || nError) return 'error';
+		if (scenarioMetadata?.requiresN && n === null) return 'config';
+		return 'simulation';
+	})();
+	
 	$: errorMessage = scenarioError || nError;
-	$: hasError = !!errorMessage;
-	$: shouldShowConfig = scenarioMetadata?.requiresN && n === null && !hasError;
-	$: viewMode = hasError ? 'error' : shouldShowConfig ? 'config' : 'simulation';
 </script>
 
 {#if viewMode === 'error'}
@@ -56,6 +59,6 @@
 {:else if viewMode === 'config'}
 	<BackButton />
 	<SimulationConfig {scenario} {scenarioMetadata} />
-{:else if viewMode === 'simulation'}
+{:else}
 	<SimulationView {scenario} {n} />
 {/if} 
