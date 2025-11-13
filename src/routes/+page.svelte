@@ -3,45 +3,21 @@
 </script>
 
 <div class="landing">
-	<div class="hero">
-		<h1>Newton's N-Body Simulation</h1>
-		<p class="subtitle">Explore gravitational interactions in real-time</p>
-	</div>
-
-	<div class="simulations">
-		<a href={`${base}/N`} class="sim-card">
-			<div class="card-content">
-				<div class="icon">N</div>
-				<h2>N-Body Simulation</h2>
-				<p>
-					Configure and run custom N-body gravitational simulations with 2 to 1000 bodies. Watch as
-					masses interact through gravitational forces.
-				</p>
-			</div>
-		</a>
-
-		<a href={`${base}/solar`} class="sim-card">
-			<div class="card-content">
-				<div class="icon solar">☉</div>
-				<h2>Solar System</h2>
-				<p>
-					Experience a simplified solar system simulation with a central star and five orbiting
-					bodies, each with unique masses and velocities.
-				</p>
-			</div>
-		</a>
-
-		<a href={`${base}/E`} class="sim-card">
-			<div class="card-content">
-				<div class="icon einstein">E</div>
-				<h2>Einstein's Relativity</h2>
-				<p>
-					Explore N-body simulations with relativistic physics corrections. See how high-velocity
-					masses experience increased effective mass and modified gravitational interactions.
-				</p>
-			</div>
-		</a>
-	</div>
+	<h1>Simulations</h1>
+	<ul class="simulations">
+		<li>
+			<a href={`${base}/N`}>N-Body</a>
+		</li>
+		<li>
+			<a href={`${base}/solar`}>Solar System</a>
+		</li>
+		<li>
+			<a href={`${base}/E`}>Einstein</a>
+		</li>
+		<li>
+			<a href={`${base}/Q`}>Quantum</a>
+		</li>
+	</ul>
 </div>
 
 <style>
@@ -50,111 +26,51 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		justify-content: center;
 		padding: 3rem 2rem;
 		background: linear-gradient(135deg, #111 0%, #1a1a2e 100%);
 		color: white;
 	}
 
-	.hero {
-		text-align: center;
-		margin-bottom: 4rem;
-		max-width: 800px;
-	}
-
 	h1 {
-		font-size: 3.5rem;
-		margin-bottom: 1rem;
+		font-size: 2.5rem;
+		margin-bottom: 3rem;
 		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 		background-clip: text;
 	}
 
-	.subtitle {
-		font-size: 1.25rem;
-		color: #aaa;
-		margin: 0;
-	}
-
 	.simulations {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-		gap: 2rem;
-		width: 100%;
-		max-width: 1200px;
-	}
-
-	.sim-card {
-		background: #222;
-		border-radius: 16px;
-		padding: 2rem;
-		text-decoration: none;
-		color: white;
-		transition: all 0.3s ease;
-		border: 2px solid transparent;
-		display: block;
-	}
-
-	.sim-card:hover {
-		transform: translateY(-8px);
-		box-shadow: 0 12px 40px rgba(102, 126, 234, 0.3);
-		border-color: #667eea;
-		background: #2a2a3e;
-	}
-
-	.card-content {
+		list-style: none;
+		padding: 0;
+		margin: 0;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+		min-width: 200px;
 	}
 
-	.icon {
-		width: 60px;
-		height: 60px;
-		border-radius: 12px;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 2rem;
-		font-weight: bold;
-		margin-bottom: 0.5rem;
-	}
-
-	.icon.solar {
-		background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-		font-size: 2.5rem;
-	}
-
-	.icon.einstein {
-		background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
-		font-size: 2rem;
-	}
-
-	h2 {
-		font-size: 1.75rem;
+	.simulations li {
 		margin: 0;
+	}
+
+	.simulations a {
+		display: block;
+		padding: 1rem 2rem;
+		text-decoration: none;
 		color: white;
+		background: #222;
+		border-radius: 8px;
+		transition: all 0.2s ease;
+		border: 2px solid transparent;
+		text-align: center;
+		font-size: 1.25rem;
 	}
 
-	.card-content p {
-		color: #ccc;
-		line-height: 1.6;
-		margin: 0;
-		font-size: 1rem;
-	}
-
-	@media (max-width: 768px) {
-		h1 {
-			font-size: 2.5rem;
-		}
-
-		.simulations {
-			grid-template-columns: 1fr;
-		}
-
-		.landing {
-			padding: 2rem 1rem;
-		}
+	.simulations a:hover {
+		background: #2a2a3e;
+		border-color: #667eea;
+		transform: translateX(4px);
 	}
 </style>

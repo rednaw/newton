@@ -11,7 +11,9 @@ export function getScenarioMetadata(scenario) {
 	return {
 		requiresN: scenarioConfig.requiresN,
 		physicsModel: scenarioConfig?.physicsModel || getDefaultPhysicsModel(),
-		relativisticFactor: scenarioConfig?.relativisticFactor
+		relativisticFactor: scenarioConfig?.relativisticFactor,
+		quantumUncertainty: scenarioConfig?.quantumUncertainty,
+		tunnelingProbability: scenarioConfig?.tunnelingProbability
 	};
 }
 

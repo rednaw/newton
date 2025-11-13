@@ -120,3 +120,43 @@ export function getRelativisticForce(m1, m2, g, softening, relativisticFactor = 
 	const result = calculateBaseForce(m1, m2, g, m1Rel, m2Rel, effectiveSoftening);
 	return result || { x: 0, y: 0 };
 }
+
+export function getQuantumForce(m1, m2, g, softening, quantumUncertainty = 0.15, tunnelingProbability = 0.1) {
+	const dx = m2.pos.x - m1.pos.x;
+	const dy = m2.pos.y - m1.pos.y;
+	const distSq = dx * dx + dy * dy;
+
+	if (distSq === 0 || !isFinite(distSq)) {
+		return { x: 0, y: 0 };
+	}
+
+	const dist = Math.sqrt(distSq);
+
+	if (dist === 0 || !isFinite(dist)) {
+		return { x: 0, y: 0 };
+	}
+
+	const uncertaintyFactor = 1 + quantumUncertainty * Math.random();
+	const effectiveDistSq = distSq * uncertaintyFactor * uncertaintyFactor;
+
+	const minDist = (m1.radius + m2.radius) * 0.5;
+	const tunnelingFactor = dist < minDist ? 1 - tunnelingProbability : 1;
+
+	const forceMag = (g * m1.mass * m2.mass * tunnelingFactor) / (effectiveDistSq + softening * softening);
+
+	if (!isFinite(forceMag) || forceMag === 0) {
+		return { x: 0, y: 0 };
+	}
+
+	const forceX = (dx / dist) * forceMag;
+	const forceY = (dy / dist) * forceMag;
+
+	if (!isFinite(forceX) || !isFinite(forceY)) {
+		return { x: 0, y: 0 };
+	}
+
+	return {
+		x: forceX,
+		y: forceY
+	};
+}

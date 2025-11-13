@@ -1,8 +1,9 @@
-import { getForce, getRelativisticForce } from './physics.js';
+import { getForce, getRelativisticForce, getQuantumForce } from './physics.js';
 
 export const PHYSICS_MODELS = {
 	newtonian: 'newtonian',
-	relativistic: 'relativistic'
+	relativistic: 'relativistic',
+	quantum: 'quantum'
 };
 
 class PhysicsModel {
@@ -81,9 +82,44 @@ class RelativisticModel extends PhysicsModel {
 	}
 }
 
+class QuantumModel extends PhysicsModel {
+	constructor() {
+		super(PHYSICS_MODELS.quantum);
+	}
+
+	getForce(m1, m2, g, softening, params = {}) {
+		const quantumUncertainty = params.quantumUncertainty || 0.15;
+		const tunnelingProbability = params.tunnelingProbability || 0.1;
+		return getQuantumForce(m1, m2, g, softening, quantumUncertainty, tunnelingProbability);
+	}
+
+	getGammaFactor(mass, params = {}) {
+		return 1;
+	}
+
+	shouldShowTrails() {
+		return true;
+	}
+
+	shouldApplyRelativisticEffects() {
+		return false;
+	}
+
+	getVisualizationParams() {
+		return {
+			radiusMultiplier: 0.2,
+			intensityMultiplier: 2,
+			glowMultiplier: 0.8,
+			trailIntensityMultiplier: 1.5,
+			uncertaintyGlow: true
+		};
+	}
+}
+
 const models = {
 	[PHYSICS_MODELS.newtonian]: new NewtonianModel(),
-	[PHYSICS_MODELS.relativistic]: new RelativisticModel()
+	[PHYSICS_MODELS.relativistic]: new RelativisticModel(),
+	[PHYSICS_MODELS.quantum]: new QuantumModel()
 };
 
 export function getPhysicsModel(modelName) {

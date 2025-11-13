@@ -8,6 +8,8 @@
 	export let onUpdate = () => {};
 	export let physicsModel = 'newtonian';
 	export let relativisticFactor = 0.1;
+	export let quantumUncertainty = 0.15;
+	export let tunnelingProbability = 0.1;
 
 	let animationFrame;
 	let lastTime = 0;
@@ -17,7 +19,11 @@
 	let unsubscribe;
 
 	$: model = getPhysicsModel(physicsModel);
-	$: modelParams = { relativisticFactor };
+	$: modelParams = {
+		relativisticFactor,
+		quantumUncertainty,
+		tunnelingProbability
+	};
 
 	function updatePhysics(deltaTime) {
 		if (!currentConfig || masses.length === 0) return;

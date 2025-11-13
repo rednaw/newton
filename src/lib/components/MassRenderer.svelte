@@ -5,12 +5,13 @@
 	export let masses = [];
 	export let physicsModel = 'newtonian';
 	export let relativisticFactor = 0.1;
+	export let quantumUncertainty = 0.15;
 
 	const TRAIL_LENGTH = 30;
 	let trails = [];
 
 	$: model = getPhysicsModel(physicsModel);
-	$: modelParams = { relativisticFactor };
+	$: modelParams = { relativisticFactor, quantumUncertainty };
 
 	function updateTrails() {
 		if (masses.length !== trails.length) {
@@ -64,6 +65,30 @@
 		const effectiveRadius = model.shouldApplyRelativisticEffects()
 			? mass.radius * (1 + (gamma - 1) * vizParams.radiusMultiplier)
 			: mass.radius;
+
+		if (vizParams.uncertaintyGlow && quantumUncertainty) {
+			const uncertaintyGlow = effectiveRadius * (1 + quantumUncertainty * 4);
+			const hslMatch = mass.color.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+			if (hslMatch) {
+				const uncertaintyGradient = ctx.createRadialGradient(
+					mass.pos.x,
+					mass.pos.y,
+					0,
+					mass.pos.x,
+					mass.pos.y,
+					uncertaintyGlow * 2
+				);
+				uncertaintyGradient.addColorStop(0, `hsla(${hslMatch[1]}, ${hslMatch[2]}%, ${hslMatch[3]}%, 0.5)`);
+				uncertaintyGradient.addColorStop(0.3, `hsla(${hslMatch[1]}, ${hslMatch[2]}%, ${hslMatch[3]}%, 0.3)`);
+				uncertaintyGradient.addColorStop(0.6, `hsla(${hslMatch[1]}, ${hslMatch[2]}%, ${hslMatch[3]}%, 0.15)`);
+				uncertaintyGradient.addColorStop(1, 'transparent');
+				ctx.fillStyle = uncertaintyGradient;
+				ctx.beginPath();
+				ctx.arc(mass.pos.x, mass.pos.y, uncertaintyGlow * 2, 0, Math.PI * 2);
+				ctx.fill();
+			}
+		}
+
 		const glowRadius = effectiveRadius * (1 + intensity * vizParams.glowMultiplier);
 		const gradient = ctx.createRadialGradient(
 			mass.pos.x,

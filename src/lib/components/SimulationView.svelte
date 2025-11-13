@@ -16,6 +16,8 @@
 	$: configUrl = `${base}/${scenario}`;
 	$: physicsModel = scenarioMetadata?.physicsModel || 'newtonian';
 	$: relativisticFactor = scenarioMetadata?.relativisticFactor;
+	$: quantumUncertainty = scenarioMetadata?.quantumUncertainty;
+	$: tunnelingProbability = scenarioMetadata?.tunnelingProbability;
 
 	let masses = [];
 	let canvas, ctx;
@@ -77,6 +79,8 @@
 		{masses}
 		{physicsModel}
 		{relativisticFactor}
+		{quantumUncertainty}
+		{tunnelingProbability}
 		onUpdate={() => {
 			if (massRenderer) {
 				massRenderer.triggerRender();
@@ -90,5 +94,6 @@
 		{masses}
 		{physicsModel}
 		{relativisticFactor}
+		{quantumUncertainty}
 	/>
 {/if}

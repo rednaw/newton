@@ -1,11 +1,13 @@
 import { nBodyScenario } from './n-body.js';
 import { solarScenario } from './solar.js';
 import { einsteinScenario } from './einstein.js';
+import { quantumScenario } from './quantum.js';
 
 const scenarios = {
 	N: nBodyScenario,
 	solar: solarScenario,
-	E: einsteinScenario
+	E: einsteinScenario,
+	Q: quantumScenario
 };
 
 export function getScenarioConfig(scenario) {
