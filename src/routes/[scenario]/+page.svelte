@@ -1,21 +1,16 @@
 <script>
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
-	import { base } from '$app/paths';
 	import { getScenarioMetadata } from '$lib/scenarios/scenario-metadata.js';
 	import { parseRouteParams } from '$lib/utils/route-params';
 	import ErrorDisplay from '$lib/components/ErrorDisplay.svelte';
-	import BackButton from '$lib/components/BackButton.svelte';
-	import SimulationConfig from '$lib/components/SimulationConfig.svelte';
-	import SimulationView from '$lib/components/SimulationView.svelte';
+	import Simulation from '$lib/components/Simulation.svelte';
+	import { DEFAULT_N } from '$lib/scenarios/scenario-metadata.js';
 
 	$: routeParams = parseRouteParams($page, browser);
 	$: scenario = routeParams.scenario;
 	$: n = routeParams.n;
 	$: nError = routeParams.nError;
-
-	$: showSimulation = browser && $page.url.searchParams.get('sim') === 'true';
 
 	let scenarioMetadata = null;
 	let scenarioError = null;
@@ -30,21 +25,13 @@
 		}
 	}
 
-	$: viewMode = (() => {
-		if (scenarioError || nError) return 'error';
-		if (!showSimulation) return 'config';
-		if (scenarioMetadata?.requiresN && n === null) return 'config';
-		return 'simulation';
-	})();
+	$: effectiveN = scenarioMetadata?.requiresN ? (n ?? DEFAULT_N) : null;
 
 	$: errorMessage = scenarioError || nError;
 </script>
 
-{#if viewMode === 'error'}
+{#if errorMessage}
 	<ErrorDisplay error={errorMessage} />
-{:else if viewMode === 'config'}
-	<BackButton />
-	<SimulationConfig {scenario} {scenarioMetadata} />
-{:else}
-	<SimulationView {scenario} {n} {scenarioMetadata} />
+{:else if scenarioMetadata}
+	<Simulation {scenario} n={effectiveN} {scenarioMetadata} />
 {/if}

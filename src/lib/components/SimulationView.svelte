@@ -1,6 +1,5 @@
 <script>
 	import { initializeMasses } from '$lib/scenarios/scenario-factory.js';
-	import { validateN } from '$lib/utils/validation';
 	import { physicsConfig } from '$lib/stores/physics-config';
 	import { base } from '$app/paths';
 	import ErrorDisplay from '$lib/components/ErrorDisplay.svelte';
@@ -13,7 +12,7 @@
 	export let n = null;
 	export let scenarioMetadata = null;
 
-	$: configUrl = `${base}/${scenario}`;
+	$: configUrl = `${base}/`;
 	$: physicsModel = scenarioMetadata?.physicsModel || 'newtonian';
 	$: relativisticFactor = scenarioMetadata?.relativisticFactor;
 	$: quantumUncertainty = scenarioMetadata?.quantumUncertainty;
@@ -49,12 +48,11 @@
 	$: if (canvas && scenarioMetadata) {
 		try {
 			if (scenarioMetadata.requiresN) {
-				const nValidation = validateN(n);
-				if (!nValidation.valid) {
-					initializationError = nValidation.error;
+				if (n === null) {
+					initializationError = 'Number of bodies is required';
 					resetErrorState();
 				} else {
-					initializeIfNeeded(nValidation.value);
+					initializeIfNeeded(n);
 				}
 			} else {
 				initializeIfNeeded(null);
@@ -97,3 +95,4 @@
 		{quantumUncertainty}
 	/>
 {/if}
+
