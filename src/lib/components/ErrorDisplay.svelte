@@ -1,10 +1,7 @@
 <script>
-	import BackButton from '$lib/components/BackButton.svelte';
-
 	export let error;
 </script>
 
-<BackButton />
 <div class="error-container">
 	<div class="error-message">
 		<h2>Error</h2>

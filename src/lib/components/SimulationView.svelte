@@ -1,9 +1,7 @@
 <script>
 	import { initializeMasses } from '$lib/scenarios/scenario-factory.js';
 	import { physicsConfig } from '$lib/stores/physics-config';
-	import { base } from '$app/paths';
 	import ErrorDisplay from '$lib/components/ErrorDisplay.svelte';
-	import BackButton from '$lib/components/BackButton.svelte';
 	import SimulationCanvas from '$lib/components/SimulationCanvas.svelte';
 	import PhysicsSimulation from '$lib/components/PhysicsSimulation.svelte';
 	import MassRenderer from '$lib/components/MassRenderer.svelte';
@@ -11,8 +9,6 @@
 	export let scenario;
 	export let n = null;
 	export let scenarioMetadata = null;
-
-	$: configUrl = `${base}/`;
 	$: physicsModel = scenarioMetadata?.physicsModel || 'newtonian';
 	$: relativisticFactor = scenarioMetadata?.relativisticFactor;
 	$: quantumUncertainty = scenarioMetadata?.quantumUncertainty;
@@ -27,20 +23,26 @@
 	$: currentG = $physicsConfig.G;
 	let lastInitializedG = null;
 	let lastInitializedN = null;
+	let lastInitializedScenario = null;
 
 	function resetErrorState() {
 		masses = [];
 		lastInitializedG = null;
 		lastInitializedN = null;
+		lastInitializedScenario = null;
 	}
 
 	function initializeIfNeeded(nValue) {
 		const needsReinit =
-			lastInitializedG !== currentG || lastInitializedN !== nValue || masses.length === 0;
+			lastInitializedG !== currentG ||
+			lastInitializedN !== nValue ||
+			lastInitializedScenario !== scenario ||
+			masses.length === 0;
 		if (needsReinit) {
 			masses = initializeMasses(centerX, centerY, orbitRadius, scenario, nValue, currentG);
 			lastInitializedG = currentG;
 			lastInitializedN = nValue;
+			lastInitializedScenario = scenario;
 			initializationError = null;
 		}
 	}
@@ -65,8 +67,6 @@
 {#if displayError}
 	<ErrorDisplay error={displayError} />
 {:else}
-	<BackButton target={configUrl} />
-
 	<SimulationCanvas bind:canvas bind:ctx bind:centerX bind:centerY bind:orbitRadius />
 
 	<PhysicsSimulation

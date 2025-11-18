@@ -18,3 +18,18 @@ export function getScenarioConfig(scenario) {
 	return scenarioConfig;
 }
 
+export function getAllScenarios() {
+	return Object.keys(scenarios);
+}
+
+const scenarioNames = {
+	N: 'N-Body',
+	solar: 'Solar System',
+	E: 'Einstein',
+	Q: 'Quantum'
+};
+
+export function getScenarioName(scenario) {
+	return scenarioNames[scenario] || scenario;
+}
+

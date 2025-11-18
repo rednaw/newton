@@ -4,11 +4,15 @@
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
 	import { validatePhysicsParams, validateN } from '$lib/utils/validation';
-	import { getParameterDefault } from '$lib/scenarios/scenario-metadata.js';
+	import { getParameterDefault, getScenarioMetadata } from '$lib/scenarios/scenario-metadata.js';
+	import { getAllScenarios, getScenarioName } from '$lib/scenarios/scenario-registry.js';
 
 	export let scenario;
 	export let scenarioMetadata;
 	export let n = null;
+
+	const availableScenarios = getAllScenarios();
+	let selectedScenario = scenario;
 
 	let sidebarOpen = false;
 	let physicsParams = { G: 500, DT: 0.1, SOFTENING: 100 };
@@ -16,37 +20,46 @@
 	let nBodies = null;
 
 	onMount(() => {
-		const config = $physicsConfig;
-		physicsParams = {
-			G: config.G,
-			DT: config.DT,
-			SOFTENING: config.SOFTENING
-		};
+		physicsParams = { ...$physicsConfig };
 	});
 
 	$: if (scenarioMetadata) {
 		nBodies = n ?? getParameterDefault(scenarioMetadata, 'n');
 	}
 
-	function updatePhysicsParams() {
+	$: selectedScenario = scenario;
+
+	function clearValidationErrors() {
 		validationErrors = {};
+	}
+
+	function buildScenarioUrl(scenarioName, nValue) {
+		return `${base}/${scenarioName}${nValue ? `?n=${nValue}` : ''}`;
+	}
+
+	function convertPhysicsParams() {
+		return {
+			G: Number(physicsParams.G),
+			DT: Number(physicsParams.DT),
+			SOFTENING: Number(physicsParams.SOFTENING)
+		};
+	}
+
+	function updatePhysicsParams() {
+		clearValidationErrors();
 		const physicsValidation = validatePhysicsParams(physicsParams);
 		if (!physicsValidation.valid) {
 			validationErrors = physicsValidation.errors;
 			return;
 		}
 
-		physicsConfig.set({
-			G: Number(physicsParams.G),
-			DT: Number(physicsParams.DT),
-			SOFTENING: Number(physicsParams.SOFTENING)
-		});
+		physicsConfig.set(convertPhysicsParams());
 	}
 
 	function updateN() {
 		if (!scenarioMetadata?.parameters?.n) return;
 
-		validationErrors = {};
+		clearValidationErrors();
 		const paramSchema = scenarioMetadata.parameters.n;
 		const nValidation = validateN(nBodies, paramSchema.min, paramSchema.max);
 		if (!nValidation.valid) {
@@ -54,12 +67,25 @@
 			return;
 		}
 
-		const url = `${base}/${scenario}?n=${nValidation.value}`;
-		goto(url, { replaceState: true });
+		goto(buildScenarioUrl(scenario, nValidation.value), { replaceState: true });
 	}
 
 	function toggleSidebar() {
 		sidebarOpen = !sidebarOpen;
+	}
+
+	async function switchScenario() {
+		if (selectedScenario === scenario) return;
+		
+		try {
+			const newMetadata = getScenarioMetadata(selectedScenario);
+			const defaultN = getParameterDefault(newMetadata, 'n');
+			await goto(buildScenarioUrl(selectedScenario, defaultN));
+		} catch (e) {
+			clearValidationErrors();
+			validationErrors.scenario = 'Invalid scenario';
+			selectedScenario = scenario;
+		}
 	}
 </script>
 
@@ -85,6 +111,23 @@
 <div class="sidebar" class:open={sidebarOpen}>
 	<div class="sidebar-content">
 		<h2>Configuration</h2>
+
+		<div class="config-section">
+			<h3>Scenario</h3>
+			<div class="param-group">
+				<label>
+					Simulation Type:
+					<select bind:value={selectedScenario} on:change={switchScenario} class="scenario-select">
+						{#each availableScenarios as s}
+							<option value={s}>{getScenarioName(s)}</option>
+						{/each}
+					</select>
+					{#if validationErrors.scenario}
+						<span class="error-text">{validationErrors.scenario}</span>
+					{/if}
+				</label>
+			</div>
+		</div>
 
 		<div class="config-section">
 			<h3>Physics Parameters</h3>
@@ -268,6 +311,28 @@
 	.param-group input[type='number'].error {
 		border-color: #ff4444;
 		background: rgba(255, 68, 68, 0.1);
+	}
+
+	.scenario-select {
+		background: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		color: white;
+		padding: 0.5rem;
+		border-radius: 4px;
+		width: 100%;
+		font-size: 1rem;
+		cursor: pointer;
+	}
+
+	.scenario-select:focus {
+		outline: none;
+		border-color: #667eea;
+		background: rgba(255, 255, 255, 0.15);
+	}
+
+	.scenario-select option {
+		background: #222;
+		color: white;
 	}
 
 	.error-text {

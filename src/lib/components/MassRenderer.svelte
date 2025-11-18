@@ -46,6 +46,19 @@
 		ctx.stroke();
 	}
 
+	function parseHSL(color) {
+		const match = color.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+		return match ? { h: match[1], s: match[2], l: match[3] } : null;
+	}
+
+	function createGradient(x, y, radius, stops) {
+		const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+		stops.forEach(({ offset, color }) => {
+			gradient.addColorStop(offset, color);
+		});
+		return gradient;
+	}
+
 	function drawMass(mass) {
 		if (!ctx) return;
 
@@ -54,52 +67,35 @@
 		const intensity = Math.min(1, (gamma - 1) * vizParams.intensityMultiplier);
 
 		let color = mass.color;
-		if (model.shouldApplyRelativisticEffects() && gamma > 1) {
-			const hslMatch = mass.color.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
-			if (hslMatch) {
-				const lightness = Math.min(100, parseInt(hslMatch[3]) + intensity * 30);
-				color = `hsl(${hslMatch[1]}, ${hslMatch[2]}%, ${lightness}%)`;
-			}
+		const hsl = parseHSL(mass.color);
+		if (hsl && model.shouldApplyRelativisticEffects() && gamma > 1) {
+			const lightness = Math.min(100, parseInt(hsl.l) + intensity * 30);
+			color = `hsl(${hsl.h}, ${hsl.s}%, ${lightness}%)`;
 		}
 
 		const effectiveRadius = model.shouldApplyRelativisticEffects()
 			? mass.radius * (1 + (gamma - 1) * vizParams.radiusMultiplier)
 			: mass.radius;
 
-		if (vizParams.uncertaintyGlow && quantumUncertainty) {
+		if (vizParams.uncertaintyGlow && quantumUncertainty && hsl) {
 			const uncertaintyGlow = effectiveRadius * (1 + quantumUncertainty * 4);
-			const hslMatch = mass.color.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
-			if (hslMatch) {
-				const uncertaintyGradient = ctx.createRadialGradient(
-					mass.pos.x,
-					mass.pos.y,
-					0,
-					mass.pos.x,
-					mass.pos.y,
-					uncertaintyGlow * 2
-				);
-				uncertaintyGradient.addColorStop(0, `hsla(${hslMatch[1]}, ${hslMatch[2]}%, ${hslMatch[3]}%, 0.5)`);
-				uncertaintyGradient.addColorStop(0.3, `hsla(${hslMatch[1]}, ${hslMatch[2]}%, ${hslMatch[3]}%, 0.3)`);
-				uncertaintyGradient.addColorStop(0.6, `hsla(${hslMatch[1]}, ${hslMatch[2]}%, ${hslMatch[3]}%, 0.15)`);
-				uncertaintyGradient.addColorStop(1, 'transparent');
-				ctx.fillStyle = uncertaintyGradient;
-				ctx.beginPath();
-				ctx.arc(mass.pos.x, mass.pos.y, uncertaintyGlow * 2, 0, Math.PI * 2);
-				ctx.fill();
-			}
+			const gradient = createGradient(mass.pos.x, mass.pos.y, uncertaintyGlow * 2, [
+				{ offset: 0, color: `hsla(${hsl.h}, ${hsl.s}%, ${hsl.l}%, 0.5)` },
+				{ offset: 0.3, color: `hsla(${hsl.h}, ${hsl.s}%, ${hsl.l}%, 0.3)` },
+				{ offset: 0.6, color: `hsla(${hsl.h}, ${hsl.s}%, ${hsl.l}%, 0.15)` },
+				{ offset: 1, color: 'transparent' }
+			]);
+			ctx.fillStyle = gradient;
+			ctx.beginPath();
+			ctx.arc(mass.pos.x, mass.pos.y, uncertaintyGlow * 2, 0, Math.PI * 2);
+			ctx.fill();
 		}
 
 		const glowRadius = effectiveRadius * (1 + intensity * vizParams.glowMultiplier);
-		const gradient = ctx.createRadialGradient(
-			mass.pos.x,
-			mass.pos.y,
-			0,
-			mass.pos.x,
-			mass.pos.y,
-			glowRadius * 2
-		);
-		gradient.addColorStop(0, color);
-		gradient.addColorStop(1, 'transparent');
+		const gradient = createGradient(mass.pos.x, mass.pos.y, glowRadius * 2, [
+			{ offset: 0, color },
+			{ offset: 1, color: 'transparent' }
+		]);
 		ctx.fillStyle = gradient;
 		ctx.beginPath();
 		ctx.arc(mass.pos.x, mass.pos.y, glowRadius * 2, 0, Math.PI * 2);
