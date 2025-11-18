@@ -9,7 +9,9 @@ const QUANTUM_UNCERTAINTY = 0.15;
 const TUNNELING_PROBABILITY = 0.1;
 
 export const quantumScenario = {
-	requiresN: true,
+	parameters: {
+		n: { default: 3, min: 2, max: 1000 }
+	},
 	masses: (n) => Array(n).fill(MASS),
 	radii: (n) => Array(n).fill(RADIUS),
 	colors: (n) =>

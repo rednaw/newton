@@ -5,7 +5,9 @@ const COLOR_LIGHTNESS = 60;
 const VELOCITY_MULTIPLIER = 0.2;
 
 export const nBodyScenario = {
-	requiresN: true,
+	parameters: {
+		n: { default: 3, min: 2, max: 1000 }
+	},
 	masses: (n) => Array(n).fill(MASS),
 	radii: (n) => Array(n).fill(RADIUS),
 	colors: (n) =>

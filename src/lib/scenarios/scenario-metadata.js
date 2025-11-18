@@ -1,19 +1,21 @@
 import { getScenarioConfig } from './scenario-registry.js';
 import { getDefaultPhysicsModel } from '../physics-models.js';
 
-export const DEFAULT_N = 3;
-
 export function getScenarioMetadata(scenario) {
 	const scenarioConfig = getScenarioConfig(scenario);
-	if (typeof scenarioConfig.requiresN !== 'boolean') {
-		throw new Error(`Scenario ${scenario} must define requiresN as a boolean`);
+	if (!scenarioConfig.parameters) {
+		throw new Error(`Scenario ${scenario} must define parameters`);
 	}
 	return {
-		requiresN: scenarioConfig.requiresN,
+		parameters: scenarioConfig.parameters,
 		physicsModel: scenarioConfig?.physicsModel || getDefaultPhysicsModel(),
 		relativisticFactor: scenarioConfig?.relativisticFactor,
 		quantumUncertainty: scenarioConfig?.quantumUncertainty,
 		tunnelingProbability: scenarioConfig?.tunnelingProbability
 	};
+}
+
+export function getParameterDefault(scenarioMetadata, paramName) {
+	return scenarioMetadata?.parameters?.[paramName]?.default ?? null;
 }
 

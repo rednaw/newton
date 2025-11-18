@@ -4,7 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
 	import { validatePhysicsParams, validateN } from '$lib/utils/validation';
-	import { DEFAULT_N } from '$lib/scenarios/scenario-metadata.js';
+	import { getParameterDefault } from '$lib/scenarios/scenario-metadata.js';
 
 	export let scenario;
 	export let scenarioMetadata;
@@ -13,7 +13,7 @@
 	let sidebarOpen = false;
 	let physicsParams = { G: 500, DT: 0.1, SOFTENING: 100 };
 	let validationErrors = {};
-	let nBodies = DEFAULT_N;
+	let nBodies = null;
 
 	onMount(() => {
 		const config = $physicsConfig;
@@ -24,8 +24,8 @@
 		};
 	});
 
-	$: if (scenarioMetadata?.requiresN) {
-		nBodies = n ?? DEFAULT_N;
+	$: if (scenarioMetadata) {
+		nBodies = n ?? getParameterDefault(scenarioMetadata, 'n');
 	}
 
 	function updatePhysicsParams() {
@@ -44,10 +44,11 @@
 	}
 
 	function updateN() {
-		if (!scenarioMetadata?.requiresN) return;
+		if (!scenarioMetadata?.parameters?.n) return;
 
 		validationErrors = {};
-		const nValidation = validateN(nBodies);
+		const paramSchema = scenarioMetadata.parameters.n;
+		const nValidation = validateN(nBodies, paramSchema.min, paramSchema.max);
 		if (!nValidation.valid) {
 			validationErrors.nBodies = nValidation.error;
 			return;
@@ -140,7 +141,7 @@
 			</div>
 		</div>
 
-		{#if scenarioMetadata?.requiresN}
+		{#if scenarioMetadata?.parameters?.n}
 			<div class="config-section">
 				<h3>Simulation Configuration</h3>
 				<div class="param-group">
@@ -149,8 +150,8 @@
 						<input
 							type="number"
 							bind:value={nBodies}
-							min="2"
-							max="1000"
+							min={scenarioMetadata.parameters.n.min}
+							max={scenarioMetadata.parameters.n.max}
 							step="1"
 							class:error={validationErrors.nBodies}
 							on:blur={updateN}

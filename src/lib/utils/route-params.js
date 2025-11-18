@@ -1,6 +1,7 @@
 import { validateN } from './validation';
+import { getScenarioMetadata, getParameterDefault } from '../scenarios/scenario-metadata.js';
 
-export function parseRouteParams(page, browser) {
+export function parseRouteParams(page, browser, scenarioMetadata = null) {
 	if (!browser) {
 		return {
 			scenario: 'N',
@@ -13,9 +14,10 @@ export function parseRouteParams(page, browser) {
 	const nParam = page.url.searchParams.get('n');
 
 	if (nParam === null) {
+		const defaultN = scenarioMetadata ? getParameterDefault(scenarioMetadata, 'n') : null;
 		return {
 			scenario,
-			n: null,
+			n: defaultN,
 			nError: null
 		};
 	}

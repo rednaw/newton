@@ -47,15 +47,11 @@
 
 	$: if (canvas && scenarioMetadata) {
 		try {
-			if (scenarioMetadata.requiresN) {
-				if (n === null) {
-					initializationError = 'Number of bodies is required';
-					resetErrorState();
-				} else {
-					initializeIfNeeded(n);
-				}
+			if (n === null) {
+				initializationError = 'Number of bodies is required';
+				resetErrorState();
 			} else {
-				initializeIfNeeded(null);
+				initializeIfNeeded(n);
 			}
 		} catch (e) {
 			initializationError = e.message || 'Failed to initialize simulation';

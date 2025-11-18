@@ -8,7 +8,9 @@ const VELOCITY_MULTIPLIER = 0.25;
 const RELATIVISTIC_FACTOR = 0.0002;
 
 export const einsteinScenario = {
-	requiresN: true,
+	parameters: {
+		n: { default: 3, min: 2, max: 1000 }
+	},
 	masses: (n) => Array(n).fill(MASS),
 	radii: (n) => Array(n).fill(RADIUS),
 	colors: (n) =>

@@ -15,11 +15,13 @@ const BASE_MASS = 1000;
 const VELOCITY_MULTIPLIER = 0.008;
 
 export const solarScenario = {
-	requiresN: false,
-	masses: () => MASSES,
-	radii: () => RADII,
-	colors: () => COLORS,
-	initialPositions: (centerX, centerY, orbitRadius) => () => [
+	parameters: {
+		n: { default: 6, min: 6, max: 6 }
+	},
+	masses: (n) => MASSES,
+	radii: (n) => RADII,
+	colors: (n) => COLORS,
+	initialPositions: (centerX, centerY, orbitRadius) => (n) => [
 		{ x: centerX, y: centerY },
 		{
 			x: centerX + orbitRadius * INNER_ORBIT_RADIUS_MULTIPLIER,
@@ -42,7 +44,7 @@ export const solarScenario = {
 			y: centerY
 		}
 	],
-	initialVelocities: (baseVelocity) => () => {
+	initialVelocities: (baseVelocity) => (n) => {
 		const v1 = baseVelocity * INNER_ORBIT_VELOCITY_MULTIPLIER;
 		const v2 = baseVelocity * OUTER_ORBIT_VELOCITY_MULTIPLIER;
 		const vm1 = baseVelocity * PLANET1_VELOCITY_MULTIPLIER;
