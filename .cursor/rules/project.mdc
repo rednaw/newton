@@ -1,0 +1,9 @@
+---
+description: Newton identity — static N-body / physics
+alwaysApply: true
+---
+
+# Newton
+
+SvelteKit **adapter-static** physics / N-body simulation (scenarios, MassRenderer). GH Pages (`rednaw.github.io/newton`). No Dev Container — local Node is fine.
+
